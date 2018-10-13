@@ -72,6 +72,20 @@ def relu():
     
 def pooling(self, listOfImages):
     #Pooling step goes here
+    window = 2
+    stride = 2
+    wX = 0
+    wY = 0
+    poolImages = []
+    for e in range (0, len(listOfImages)):
+        poolI = []
+        for f in range (0, len(listOfImages[e])):
+            for g in range (0, len(listOfImages[e][f])):
+                windowMax = 0
+                for h in range (wY, wY+window-1):
+                    for i in range (wX, wX+window-1):
+                        windowMax = max(windowMax, listOfImages[e][h][i])
+                    
     
 
     
