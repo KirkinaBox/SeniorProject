@@ -7,6 +7,7 @@ Created on Sun Oct  7 23:41:55 2018
 """
 
 from PIL import Image
+from random import randint
 
 file = open("TrainingImages_withScores.csv", "r")
 trainingList = file.read()
@@ -17,10 +18,41 @@ for i in range (1, len(trainingList)):
     trainingList[i] = trainingList[i].split(",")
     #print(trainingList[i][0])
     image = Image.open(trainingList[i][0])
-    image = image.resize((image.size[0]/20, image.size[1]/20))
+    image = image.resize((image.size[0]/100, image.size[1]/100))
     image = image.convert("HSV")
     print("converted")
     score = trainingList[i][1]
   
 
 image.show()
+#print(image.getpixel((14, 79))[2])
+print(image.size[0])
+print(image.size[1])
+#print(randint(0, 255))
+
+
+def convolution(testImage, testScore):
+
+    brightFeature = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)]]
+    
+    dimFeature = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
+                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)]]
+    featureList = [brightFeature, dimFeature]
+    windowSize = 10
+    cx = 0
+    cy = 0
+    featureTotal = 0
+    
+        
+    
