@@ -5,6 +5,10 @@ Created on Thu Oct 11 17:23:20 2018
 
 @author: jamiecrow
 """
+from PIL import Image
+from random import randint
+import math
+
 
 brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                 [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -34,61 +38,68 @@ def convolution(self, testImage, testScore, features):
     window = 5
     wX = 0
     wY = 0
-    metaX = 0
-    metaY = 0
     filteredImageList = []
     
-    for filter in range (0, len(features)):
+    for filter in range (0, len(features)): #for each feature
         filteredImage = []
-        for a in range (metaY, testImage.size[1]-window):
+        wX = 0
+        wY = 0
+        while (wY+window-1 <= len(features[filter])):
             filteredRow = []
-            for b in range (metaX, testImage.size[0]-window):
-                #sliding the window down the row
+            while (wX+window-1 <= len(features[filter][0])):
                 windowTotal = 0
-                for c in range (wY, wY+window-1):
-                    for d in range (wX, wX+window-1):
-                        if (testImage.getpixel((d, c))[2] == filter[c][d]):
+                for a in range (wY, wY+window-1):
+                    for b in range (wX, wX+window-1):
+                        if (testImage.getpixel((wX, wY))[2] == filter[wY][wX]):
                             windowTotal += 1
                         else:
                             windowTotal += -1
-                
-                average = windowTotal/(Math.pow(window, 2))
+                average = windowTotal/(math.pow(window, 2))
                 if (average < 0): #ReLU step
                     filteredRow.append(0)
                 else:
-                    filteredRow.append(average)   
+                    filteredRow.append(average)
                 wX += 1
             filteredImage.append(filteredRow)
             wY += 1
         filteredImageList.append(filteredImage)
+    
                 
     return(self.pooling(filteredImageList)) #don't think this'll work without pooling() attached to a parent
     
     
-def relu():
+#def relu():
     #Rectified Linear Unit (ReLU) step goes here
     #swap negative numbers for 0
     #source: https://brohrer.github.io/how_convolutional_neural_networks_work.html
     
 def pooling(self, listOfImages):
     #Pooling step goes here
-    window = 2
+    #window = 2
     stride = 2
-    wX = 0
-    wY = 0
+    
     poolImages = []
-    for e in range (0, len(listOfImages)):
-        poolI = []
-        for f in range (0, len(listOfImages[e])):
-            for g in range (0, len(listOfImages[e][f])):
-                windowMax = 0
-                for h in range (wY, wY+window-1):
-                    for i in range (wX, wX+window-1):
-                        windowMax = max(windowMax, listOfImages[e][h][i])
-                    
-    
-
-    
+    for e in range (0, len(listOfImages)): #for each image
+        poolSingle = []
+        wX = 0
+        wY = 0
+        while (wY+stride <= len(listOfImages[e])):
+            poolSingleRow=[]
+            while (wX+stride <= len(listOfImages[e][0])):
+                uno = listOfImages[e][wY][wX]
+                dos = listOfImages[e][wY][wX+1]
+                tres = listOfImages[e][wY+1][wX]
+                cuatro = listOfImages[e][wY+1][wX+1]
+                windowMax = max(uno, dos, tres, cuatro)
+                poolSingleRow.append(windowMax)
+                wX = wX+stride
+            poolSingle.append(poolSingleRow)
+            wX = 0
+            wY = wY+stride
+        poolImages.append(poolSingle)
+                
+            
+        
 def fc(testScore):
     #Fully Connected layer goes here (I think)
     #will probably use Softmax function

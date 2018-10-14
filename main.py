@@ -8,6 +8,7 @@ Created on Sun Oct  7 23:41:55 2018
 
 from PIL import Image
 from random import randint
+import math
 
 file = open("TrainingImages_withScores.csv", "r")
 trainingList = file.read()
@@ -28,6 +29,7 @@ image.show()
 #print(image.getpixel((14, 79))[2])
 print(image.size[0])
 print(image.size[1])
+print(math.pow(2,3))
 #print(randint(0, 255))
 
 
