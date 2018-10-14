@@ -65,7 +65,7 @@ def convolution(self, testImage, testScore, features):
         filteredImageList.append(filteredImage)
     
                 
-    return(self.pooling(filteredImageList)) #don't think this'll work without pooling() attached to a parent
+    return(self.pooling(filteredImageList, testScore)) #don't think this'll work without pooling() attached to a parent
     
     
 #def relu():
@@ -73,7 +73,7 @@ def convolution(self, testImage, testScore, features):
     #swap negative numbers for 0
     #source: https://brohrer.github.io/how_convolutional_neural_networks_work.html
     
-def pooling(self, listOfImages):
+def pooling(self, listOfImages, testScore):
     #Pooling step goes here
     #window = 2
     stride = 2
@@ -97,14 +97,23 @@ def pooling(self, listOfImages):
             wX = 0
             wY = wY+stride
         poolImages.append(poolSingle)
-                
+     
+    return(self.fc(poolImages, testScore))
             
         
-def fc(testScore):
+def fc(self, poolImages, testScore):
     #Fully Connected layer goes here (I think)
     #will probably use Softmax function
         #sources: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
         #         http://cs231n.github.io/linear-classify/#softmax       
+    
+    #Flattening cube (poolImages) into vector
+    flattened = []
+    for l in range (0, len(poolImages)):
+        for m in range (0, len(poolImages[l])):
+            for n in range (0, len(poolImages[l][m])):
+                flattened.append(poolImages[l][m][n])
+    
     
     # targetVector = [dim, normal, bright]
     if (testScore == 0):
@@ -113,3 +122,7 @@ def fc(testScore):
         targetVector = [0, 1, 0] #normal
     if (testScore == 2):
         targetVector = [0, 0, 1] #bright
+    
+    
+    #Error calculation
+    #source: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
