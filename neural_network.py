@@ -118,12 +118,14 @@ def fc(self, poolImages, testScore):
     for l in range (0, len(poolImages)):
         for m in range (0, len(poolImages[l])):
             for n in range (0, len(poolImages[l][m])):
-                node = math.exp(poolImages[l][m][n])
-                softmaxSum += node
+                #don't think Softmax should be in this step
+                #need to figure that out
+                node = math.exp(poolImages[l][m][n]) #Softmax
+                softmaxSum += node #Softmax
                 flattened.append(node)
     
     for s in range (0, len(flattened)):
-        flattened[s] = flattened[s]/softmaxSum
+        flattened[s] = flattened[s]/softmaxSum #Softmax
     
     # targetVector = [dim, normal, bright]
     if (testScore == 0):

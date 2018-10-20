@@ -19,7 +19,7 @@ for i in range (1, len(trainingList)):
     trainingList[i] = trainingList[i].split(",")
     #print(trainingList[i][0])
     image = Image.open(trainingList[i][0])
-    image = image.resize((image.size[0]/100, image.size[1]/100))
+    image = image.resize((image.size[0]/140, image.size[1]/140))
     image = image.convert("HSV")
     print("converted")
     score = trainingList[i][1]
