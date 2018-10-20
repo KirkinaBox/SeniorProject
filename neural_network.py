@@ -103,17 +103,27 @@ def pooling(self, listOfImages, testScore):
         
 def fc(self, poolImages, testScore):
     #Fully Connected layer goes here (I think)
+    
     #will probably use Softmax function
         #sources: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
-        #         http://cs231n.github.io/linear-classify/#softmax       
+        #         http://cs231n.github.io/linear-classify/#softmax   
+        #         https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
     
     #Flattening cube (poolImages) into vector
+    #source: https://www.quora.com/What-is-the-meaning-of-flattening-step-in-a-convolutional-neural-network
+    #        answer by Alex Coninx
+    
+    softmaxSum = 0
     flattened = []
     for l in range (0, len(poolImages)):
         for m in range (0, len(poolImages[l])):
             for n in range (0, len(poolImages[l][m])):
-                flattened.append(poolImages[l][m][n])
+                node = math.exp(poolImages[l][m][n])
+                softmaxSum += node
+                flattened.append(node)
     
+    for s in range (0, len(flattened)):
+        flattened[s] = flattened[s]/softmaxSum
     
     # targetVector = [dim, normal, bright]
     if (testScore == 0):
