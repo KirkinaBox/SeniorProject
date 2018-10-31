@@ -8,6 +8,7 @@ Created on Thu Oct 11 17:23:20 2018
 from PIL import Image
 from random import randint
 import math
+import numpy as np
 
 
 brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -113,19 +114,22 @@ def fc(self, poolImages, testScore):
     #source: https://www.quora.com/What-is-the-meaning-of-flattening-step-in-a-convolutional-neural-network
     #        answer by Alex Coninx
     
-    softmaxSum = 0
+    #softmaxSum = 0
     flattened = []
     for l in range (0, len(poolImages)):
         for m in range (0, len(poolImages[l])):
             for n in range (0, len(poolImages[l][m])):
                 #don't think Softmax should be in this step
                 #need to figure that out
-                node = math.exp(poolImages[l][m][n]) #Softmax
-                softmaxSum += node #Softmax
-                flattened.append(node)
+                
+                #node = math.exp(poolImages[l][m][n]) #Softmax
+                #softmaxSum += node #Softmax
+                #flattened.append(node)
+                flattened.append(poolImages[l][m][n])
     
-    for s in range (0, len(flattened)):
-        flattened[s] = flattened[s]/softmaxSum #Softmax
+    weightList = self.weights(len(flattened))
+    #for s in range (0, len(flattened)):
+        #flattened[s] = flattened[s]/softmaxSum #Softmax
     
     # targetVector = [dim, normal, bright]
     if (testScore == 0):
@@ -135,6 +139,11 @@ def fc(self, poolImages, testScore):
     if (testScore == 2):
         targetVector = [0, 0, 1] #bright
     
-    
     #Error calculation
     #source: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
+    
+    
+def weights(self, length):
+    #if first time:
+    w = np.random.randn(length)
+    return w
