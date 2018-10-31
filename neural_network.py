@@ -100,6 +100,9 @@ def pooling(self, listOfImages, testScore):
         poolImages.append(poolSingle)
      
     return(self.fc(poolImages, testScore))
+
+
+
             
         
 def fc(self, poolImages, testScore):
@@ -127,9 +130,35 @@ def fc(self, poolImages, testScore):
                 #flattened.append(node)
                 flattened.append(poolImages[l][m][n])
     
-    weightList = self.weights(len(flattened))
+    
+    #Weighted connections pointing to each node in layer2
+    #source: http://neuralnetworksanddeeplearning.com/chap2.html
+    layer2num = 10
+    layer2 = []
+    bias2 = 0 #???
+    #weightMatrix = []
+    for i in range(0, layer2num-1):
+        weightList = self.weights(len(flattened))
+        #weightMatrix.append(weightList)
+        a = np.dot(weightList, flattened) + bias2
+        layer2.append(a)
+     
+    
+    #Weighted connections pointing to each node in layer3
+    #source: http://neuralnetworksanddeeplearning.com/chap2.html
+    layer3num = 3
+    layer3 = []
+    bias3 = 0
+    for i in range(0, layer3num-1):
+        weightList = self.weights(layer2num)
+        a = np.dot(weightList, layer2) + bias3
+        layer3.append(a)
+    
+   
     #for s in range (0, len(flattened)):
         #flattened[s] = flattened[s]/softmaxSum #Softmax
+    
+    
     
     # targetVector = [dim, normal, bright]
     if (testScore == 0):
@@ -141,6 +170,9 @@ def fc(self, poolImages, testScore):
     
     #Error calculation
     #source: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
+ 
+    
+    
     
     
 def weights(self, length):
