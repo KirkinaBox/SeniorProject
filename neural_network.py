@@ -117,6 +117,17 @@ def fc(self, poolImages, testScore):
     #source: https://www.quora.com/What-is-the-meaning-of-flattening-step-in-a-convolutional-neural-network
     #        answer by Alex Coninx
     
+    
+    # targetVector = [dim, normal, bright]
+    targetVector = []
+    if (testScore == 0):
+        targetVector = [1, 0, 0] #dim
+    if (testScore == 1):
+        targetVector = [0, 1, 0] #normal
+    if (testScore == 2):
+        targetVector = [0, 0, 1] #bright
+    
+    
     #softmaxSum = 0
     flattened = []
     for l in range (0, len(poolImages)):
@@ -138,9 +149,9 @@ def fc(self, poolImages, testScore):
     bias2 = 0 #???
     #weightMatrix = []
     for i in range(0, layer2num-1):
-        weightList = self.weights(len(flattened))
+        weightList2 = self.weights(len(flattened))
         #weightMatrix.append(weightList)
-        a = np.dot(weightList, flattened) + bias2
+        a = np.dot(weightList2, flattened) + bias2
         layer2.append(a)
      
     
@@ -150,23 +161,19 @@ def fc(self, poolImages, testScore):
     layer3 = []
     bias3 = 0
     for i in range(0, layer3num-1):
-        weightList = self.weights(layer2num)
-        a = np.dot(weightList, layer2) + bias3
+        weightList3 = self.weights(layer2num)
+        a = np.dot(weightList3, layer2) + bias3
         layer3.append(a)
-    
+    #for j in range(0, layer3num-1):
+    errorA = np.array(layer3 - targetVector)
+    errorB = np.array()
    
     #for s in range (0, len(flattened)):
         #flattened[s] = flattened[s]/softmaxSum #Softmax
     
     
     
-    # targetVector = [dim, normal, bright]
-    if (testScore == 0):
-        targetVector = [1, 0, 0] #dim
-    if (testScore == 1):
-        targetVector = [0, 1, 0] #normal
-    if (testScore == 2):
-        targetVector = [0, 0, 1] #bright
+    
     
     #Error calculation
     #source: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
