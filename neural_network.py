@@ -148,9 +148,10 @@ def fc(self, poolImages, testScore):
     layer2num = 10
     layer2 = []
     bias2 = 0 #???
-    #weightMatrix = []
+    weightMatrix2 = []
     for i in range(0, layer2num-1):
         weightList2 = self.weights(len(flattened))
+        weightMatrix2.append(weightList2)
         #weightMatrix.append(weightList)
         a = np.dot(weightList2, flattened) + bias2
         layer2.append(a)
@@ -161,11 +162,16 @@ def fc(self, poolImages, testScore):
     layer3num = 3
     layer3 = []
     bias3 = 0
+    weightMatrix3 = []
     for i in range(0, layer3num-1):
         weightList3 = self.weights(layer2num)
+        weightMatrix3.append(weightList3)
         a = np.dot(weightList3, layer2) + bias3
         layer3.append(a)
-    errorList = []
+        
+    #Output layer error calculation
+    #source: http://neuralnetworksanddeeplearning.com/chap2.html
+    outputErrorList = []
     for j in range(0, layer3num-1):
         errorA = np.array(layer3 - targetVector)
         a = layer3[j]
@@ -173,12 +179,24 @@ def fc(self, poolImages, testScore):
         errorAB = np.multiply(errorA, errorB)
         errorList.append(errorAB)
    
+    
+    layer2errorList = []
+    for k in range(0, layer2num-1):
+        errorAa = np.array(weightMatrix).transpose()
+        errorAb = np.array(outputErrorList)
+        errorA = np.dot(errorAa, errorAb)
+        a = layer2[k]
+        errorB = np.array(derivative(a, 1.0))
+        errorAB = np.multiply(errorA, errorB)
+        layer2errorList.append(errorAB)
+        
+        
+        
+        
+        
     #for s in range (0, len(flattened)):
         #flattened[s] = flattened[s]/softmaxSum #Softmax
-    
-    
-    
-    
+
     
     #Error calculation
     #source: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
