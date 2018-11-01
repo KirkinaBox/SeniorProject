@@ -9,6 +9,7 @@ from PIL import Image
 from random import randint
 import math
 import numpy as np
+from scipy.misc import derivative
 
 
 brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -164,9 +165,13 @@ def fc(self, poolImages, testScore):
         weightList3 = self.weights(layer2num)
         a = np.dot(weightList3, layer2) + bias3
         layer3.append(a)
-    #for j in range(0, layer3num-1):
-    errorA = np.array(layer3 - targetVector)
-    errorB = np.array()
+    errorList = []
+    for j in range(0, layer3num-1):
+        errorA = np.array(layer3 - targetVector)
+        a = layer3[j]
+        errorB = np.array(derivative(a, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
+        errorAB = np.multiply(errorA, errorB)
+        errorList.append(errorAB)
    
     #for s in range (0, len(flattened)):
         #flattened[s] = flattened[s]/softmaxSum #Softmax
