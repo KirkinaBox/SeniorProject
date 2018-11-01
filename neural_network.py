@@ -32,6 +32,8 @@ normalFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 2
 
 featureMap = [brightFilter, dimFilter, normalFilter]
 
+fcLayer2Weights = []
+fcLayer3Weights = []
 
 
 def convolution(self, testImage, testScore, features):
@@ -118,6 +120,9 @@ def fc(self, poolImages, testScore):
     #source: https://www.quora.com/What-is-the-meaning-of-flattening-step-in-a-convolutional-neural-network
     #        answer by Alex Coninx
     
+    global fcLayer2Weights
+    global fcLayer3Weights
+    
     
     # targetVector = [dim, normal, bright]
     targetVector = []
@@ -150,7 +155,7 @@ def fc(self, poolImages, testScore):
     bias2 = 0 #???
     weightMatrix2 = []
     for i in range(0, layer2num-1):
-        weightList2 = self.weights(len(flattened))
+        weightList2 = self.weights(len(flattened), 2)
         weightMatrix2.append(weightList2)
         #weightMatrix.append(weightList)
         a = np.dot(weightList2, flattened) + bias2
@@ -164,9 +169,9 @@ def fc(self, poolImages, testScore):
     bias3 = 0
     weightMatrix3 = []
     for i in range(0, layer3num-1):
-        weightList3 = self.weights(layer2num)
+        weightList3 = self.weights(layer2num, 3)
         weightMatrix3.append(weightList3)
-        a = np.dot(weightList3, layer2) + bias3
+        a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
         layer3.append(a)
         
     #Output layer error calculation
@@ -189,8 +194,12 @@ def fc(self, poolImages, testScore):
         errorB = np.array(derivative(a, 1.0))
         errorAB = np.multiply(errorA, errorB)
         layer2errorList.append(errorAB)
-        
-        
+    
+     
+     gradient2 = []
+     for l in range(0, len(weightMatrix2)):
+         for m in range(0, len(weightMatrix2[l])):
+             gradientA = np.dotnp.array(layer2errorList[l][m])
         
         
         
@@ -205,7 +214,14 @@ def fc(self, poolImages, testScore):
     
     
     
-def weights(self, length):
+def weights(self, length, layer):
+    global fcLayer2Weights
+    global fcLayer3Weights
     #if first time:
     w = np.random.randn(length)
+    if (layer == 2):
+        fcLayer2Weights.append(w) 
+    if (layer == 3):
+        fcLayer3Weights.append(w)
+        
     return w
