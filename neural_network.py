@@ -173,6 +173,7 @@ def fc(self, poolImages, testScore):
         weightMatrix3.append(weightList3)
         a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
         layer3.append(a)
+     
         
     #Output layer error calculation
     #source: http://neuralnetworksanddeeplearning.com/chap2.html
@@ -182,24 +183,33 @@ def fc(self, poolImages, testScore):
         a = layer3[j]
         errorB = np.array(derivative(a, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
         errorAB = np.multiply(errorA, errorB)
-        errorList.append(errorAB)
+        outputErrorList.append(errorAB)
    
     
+    #Error backpropagation for layer2
     layer2errorList = []
     for k in range(0, layer2num-1):
-        errorAa = np.array(weightMatrix).transpose()
+        errorAa = np.array(weightMatrix3).transpose()
         errorAb = np.array(outputErrorList)
-        errorA = np.dot(errorAa, errorAb)
+        errorA = np.dot(errorAa, errorAb) #either np.dot or np.multiply
         a = layer2[k]
         errorB = np.array(derivative(a, 1.0))
         errorAB = np.multiply(errorA, errorB)
         layer2errorList.append(errorAB)
     
-     
-     gradient2 = []
-     for l in range(0, len(weightMatrix2)):
-         for m in range(0, len(weightMatrix2[l])):
-             gradientA = np.dotnp.array(layer2errorList[l][m])
+    
+    #Gradient descent for output layer
+    for n in range(0, len(weightMatrix3)):
+        for o in range(0, len(weightMatrix3[n])):
+            gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
+            fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA   
+        
+    
+     #Gradient descent for layer2
+    for l in range(0, len(weightMatrix2)):
+        for m in range(0, len(weightMatrix2[l])):
+            gradientA = np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
+            fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
         
         
         
