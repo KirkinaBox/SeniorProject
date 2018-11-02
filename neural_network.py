@@ -125,14 +125,7 @@ def fc(self, poolImages, testScore, iteration):
     global fcLayer3Weights
     
     
-    # targetVector = [dim, normal, bright]
-    targetVector = []
-    if (testScore == 0):
-        targetVector = [1, 0, 0] #dim
-    if (testScore == 1):
-        targetVector = [0, 1, 0] #normal
-    if (testScore == 2):
-        targetVector = [0, 0, 1] #bright
+    classification = ""
     
     
     #softmaxSum = 0
@@ -175,83 +168,104 @@ def fc(self, poolImages, testScore, iteration):
         a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
         layer3.append(a)
      
+    
+    if (testScore == 3):
+        if ((layer3[0] > layer3[1]) and (layer3[0] > layer3[2])):
+            #image is dim
+            classification = "dim"
+        if ((layer3[1] > layer3[0]) and (layer3[1] > layer3[2])):
+            #image is normal
+            classification = "normal"
+        if ((layer3[2] > layer3[0]) and (layer3[2] > layer3[1])):
+            #image is bright
+            classification = "bright"
+    
+    
+    if (testScore != 3): 
         
-    #Output layer error calculation
-    #source: http://neuralnetworksanddeeplearning.com/chap2.html
-    outputErrorList = []
-    for j in range(0, layer3num-1):
-        errorA = np.array(layer3 - targetVector)
-        a = layer3[j]
-        errorB = np.array(derivative(a, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
-        errorAB = np.multiply(errorA, errorB)
-        outputErrorList.append(errorAB)
+        # targetVector = [dim, normal, bright]
+        targetVector = []
+        if (testScore == 0):
+            targetVector = [1, 0, 0] #dim
+        if (testScore == 1):
+            targetVector = [0, 1, 0] #normal
+        if (testScore == 2):
+            targetVector = [0, 0, 1] #bright
+        
+        
+        #Output layer error calculation
+        #source: http://neuralnetworksanddeeplearning.com/chap2.html
+        outputErrorList = []
+        for j in range(0, layer3num-1):
+            errorA = np.array(layer3 - targetVector)
+            a = layer3[j]
+            errorB = np.array(derivative(a, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
+            errorAB = np.multiply(errorA, errorB)
+            outputErrorList.append(errorAB)
    
     
-    #Error backpropagation for layer2
-    #source: http://neuralnetworksanddeeplearning.com/chap2.html
-    layer2errorList = []
-    for k in range(0, layer2num-1):
-        errorAa = np.array(weightMatrix3).transpose()
-        errorAb = np.array(outputErrorList)
-        errorA = np.dot(errorAa, errorAb) #either np.dot or np.multiply
-        a = layer2[k]
-        errorB = np.array(derivative(a, 1.0))
-        errorAB = np.multiply(errorA, errorB)
-        layer2errorList.append(errorAB)
+        #Error backpropagation for layer2
+        #source: http://neuralnetworksanddeeplearning.com/chap2.html
+        layer2errorList = []
+        for k in range(0, layer2num-1):
+            errorAa = np.array(weightMatrix3).transpose()
+            errorAb = np.array(outputErrorList)
+            errorA = np.dot(errorAa, errorAb) #either np.dot or np.multiply
+            a = layer2[k]
+            errorB = np.array(derivative(a, 1.0))
+            errorAB = np.multiply(errorA, errorB)
+            layer2errorList.append(errorAB)
     
     
-    #Error backpropagation for convolution filters
-    global features
-    featuresErrorList = []
-    for f in range(0, len(features)):
-        singleFeatureErrorList = []
-        for g in range(0, len(features[f])):
-            singleFeatureRow = []
-            for h in range(0, len(features[f][g])):
-                errorAa = np.array(weightMatrix2).transpose()
-                errorAb = np.array(layer2errorList)
-                errorA = np.dot(errorAa, errorAb)
-                a = features[f][g][h]
-                errorB = np.array(derivative(a, 1.0))
-                errorAB = np.multiply(errorA, errorB)
-                singleFeatureRow.append(errorAB)
-            singleFeatureErrorList.append(singleFeatureRow)
-        featuresErrorList.append(singleFeatureErrorList)
+        #Error backpropagation for convolution filters
+        global features
+        featuresErrorList = []
+        for f in range(0, len(features)):
+            singleFeatureErrorList = []
+            for g in range(0, len(features[f])):
+                singleFeatureRow = []
+                for h in range(0, len(features[f][g])):
+                    errorAa = np.array(weightMatrix2).transpose()
+                    errorAb = np.array(layer2errorList)
+                    errorA = np.dot(errorAa, errorAb)
+                    a = features[f][g][h]
+                    errorB = np.array(derivative(a, 1.0))
+                    errorAB = np.multiply(errorA, errorB)
+                    singleFeatureRow.append(errorAB)
+                singleFeatureErrorList.append(singleFeatureRow)
+            featuresErrorList.append(singleFeatureErrorList)
     
     
-    #Gradient descent for output layer
-    #source: http://neuralnetworksanddeeplearning.com/chap2.html
-    for n in range(0, len(weightMatrix3)):
-        for o in range(0, len(weightMatrix3[n])):
-            gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
-            fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA   
+        #Gradient descent for output layer
+        #source: http://neuralnetworksanddeeplearning.com/chap2.html
+        for n in range(0, len(weightMatrix3)):
+            for o in range(0, len(weightMatrix3[n])):
+                gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
+                fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA   
         
     
-    #Gradient descent for layer2
-    #source: http://neuralnetworksanddeeplearning.com/chap2.html
-    for l in range(0, len(weightMatrix2)):
-        for m in range(0, len(weightMatrix2[l])):
-            gradientA = np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
-            fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
+        #Gradient descent for layer2
+        #source: http://neuralnetworksanddeeplearning.com/chap2.html
+        for l in range(0, len(weightMatrix2)):
+            for m in range(0, len(weightMatrix2[l])):
+                gradientA = np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
+                fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
         
      
-    #Gradient descent for convolution filters
-    #updatedFilterWeights = []
-    for p in range(0, len(features)):
-        #singleFilter = []
-        for q in range(0, len(features[p])):
-            #singleFilterRow = []
-            for r in range(0, len(features[p][q])):
-                features[p][q][r] = features[p][q][r] - np.sum(featuresErrorList[p][q]) #not sure if I should use np.sum or just single error value
+        #Gradient descent for convolution filters
+        #updatedFilterWeights = []
+        for p in range(0, len(features)):
+            #singleFilter = []
+            for q in range(0, len(features[p])):
+                #singleFilterRow = []
+                for r in range(0, len(features[p][q])):
+                    features[p][q][r] = features[p][q][r] - np.sum(featuresErrorList[p][q]) #not sure if I should use np.sum or just single error value
     
     
     
-    #for s in range (0, len(flattened)):
-        #flattened[s] = flattened[s]/softmaxSum #Softmax
 
-    
-    
-     
+    return classification #if not training set
+       
     
     
 def weights(self, length, layer, iteration):
