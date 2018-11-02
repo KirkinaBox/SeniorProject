@@ -200,7 +200,7 @@ def fc(self, poolImages, testScore, iteration):
         layer2errorList.append(errorAB)
     
     
-    
+    #Error backpropagation for convolution filters
     global features
     featuresErrorList = []
     for f in range(0, len(features)):
@@ -234,7 +234,15 @@ def fc(self, poolImages, testScore, iteration):
             gradientA = np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
             fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
         
-        
+     
+    #Gradient descent for convolution filters
+    #updatedFilterWeights = []
+    for p in range(0, len(features)):
+        #singleFilter = []
+        for q in range(0, len(features[p])):
+            #singleFilterRow = []
+            for r in range(0, len(features[p][q])):
+                features[p][q][r] = features[p][q][r] - np.sum(featuresErrorList[p][q]) #not sure if I should use np.sum or just single error value
     
     
     
