@@ -30,14 +30,15 @@ normalFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 2
                 [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                 [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)]]
 
-featureMap = [brightFilter, dimFilter, normalFilter]
+features = [brightFilter, dimFilter, normalFilter]
 
 fcLayer2Weights = []
 fcLayer3Weights = []
 
 
-def convolution(self, testImage, testScore, features):
+def convolution(self, testImage, testScore, iteration):
     
+    global features
     #stride = 1
     window = 5
     wX = 0
@@ -69,7 +70,7 @@ def convolution(self, testImage, testScore, features):
         filteredImageList.append(filteredImage)
     
                 
-    return(self.pooling(filteredImageList, testScore)) #don't think this'll work without pooling() attached to a parent
+    return(self.pooling(filteredImageList, testScore, iteration)) #don't think this'll work without pooling() attached to a parent
     
     
 #def relu():
@@ -77,7 +78,7 @@ def convolution(self, testImage, testScore, features):
     #swap negative numbers for 0
     #source: https://brohrer.github.io/how_convolutional_neural_networks_work.html
     
-def pooling(self, listOfImages, testScore):
+def pooling(self, listOfImages, testScore, iteration):
     #Pooling step goes here
     #window = 2
     stride = 2
@@ -102,13 +103,13 @@ def pooling(self, listOfImages, testScore):
             wY = wY+stride
         poolImages.append(poolSingle)
      
-    return(self.fc(poolImages, testScore))
+    return(self.fc(poolImages, testScore, iteration))
 
 
 
             
         
-def fc(self, poolImages, testScore):
+def fc(self, poolImages, testScore, iteration):
     #Fully Connected layer goes here (I think)
     
     #will probably use Softmax function
@@ -155,7 +156,7 @@ def fc(self, poolImages, testScore):
     bias2 = 0 #???
     weightMatrix2 = []
     for i in range(0, layer2num-1):
-        weightList2 = self.weights(len(flattened), 2)
+        weightList2 = self.weights(len(flattened), 2, iteration)
         weightMatrix2.append(weightList2)
         #weightMatrix.append(weightList)
         a = np.dot(weightList2, flattened) + bias2
@@ -169,7 +170,7 @@ def fc(self, poolImages, testScore):
     bias3 = 0
     weightMatrix3 = []
     for i in range(0, layer3num-1):
-        weightList3 = self.weights(layer2num, 3)
+        weightList3 = self.weights(layer2num, 3, iteration)
         weightMatrix3.append(weightList3)
         a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
         layer3.append(a)
@@ -187,6 +188,7 @@ def fc(self, poolImages, testScore):
    
     
     #Error backpropagation for layer2
+    #source: http://neuralnetworksanddeeplearning.com/chap2.html
     layer2errorList = []
     for k in range(0, layer2num-1):
         errorAa = np.array(weightMatrix3).transpose()
@@ -198,40 +200,61 @@ def fc(self, poolImages, testScore):
         layer2errorList.append(errorAB)
     
     
+    
+    global features
+    featuresErrorList = []
+    for f in range(0, len(features)):
+        singleFeatureErrorList = []
+        for g in range(0, len(features[f])):
+            singleFeatureRow = []
+            for h in range(0, len(features[f][g])):
+                errorAa = np.array(weightMatrix2).transpose()
+                errorAb = np.array(layer2errorList)
+                errorA = np.dot(errorAa, errorAb)
+                a = features[f][g][h]
+                errorB = np.array(derivative(a, 1.0))
+                errorAB = np.multiply(errorA, errorB)
+                singleFeatureRow.append(errorAB)
+            singleFeatureErrorList.append(singleFeatureRow)
+        featuresErrorList.append(singleFeatureErrorList)
+    
+    
     #Gradient descent for output layer
+    #source: http://neuralnetworksanddeeplearning.com/chap2.html
     for n in range(0, len(weightMatrix3)):
         for o in range(0, len(weightMatrix3[n])):
             gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
             fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA   
         
     
-     #Gradient descent for layer2
+    #Gradient descent for layer2
+    #source: http://neuralnetworksanddeeplearning.com/chap2.html
     for l in range(0, len(weightMatrix2)):
         for m in range(0, len(weightMatrix2[l])):
             gradientA = np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
             fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
         
         
-        
+    
+    
+    
     #for s in range (0, len(flattened)):
         #flattened[s] = flattened[s]/softmaxSum #Softmax
 
     
-    #Error calculation
-    #source: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
- 
+    
+     
     
     
-    
-    
-def weights(self, length, layer):
+def weights(self, length, layer, iteration):
     global fcLayer2Weights
     global fcLayer3Weights
-    #if first time:
-    w = np.random.randn(length)
-    if (layer == 2):
-        fcLayer2Weights.append(w) 
-    if (layer == 3):
-        fcLayer3Weights.append(w)
+    w = []
+    if (iteration == 0):
+        w = np.random.randn(length)
+        if (layer == 2):
+            fcLayer2Weights.append(w) 
+        if (layer == 3):
+            fcLayer3Weights.append(w)
         
     return w
