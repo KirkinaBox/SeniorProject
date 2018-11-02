@@ -36,6 +36,8 @@ fcLayer2Weights = []
 fcLayer3Weights = []
 
 
+
+
 def convolution(self, testImage, testScore, iteration):
     
     global features
@@ -149,7 +151,7 @@ def fc(self, poolImages, testScore, iteration):
     bias2 = 0 #???
     weightMatrix2 = []
     for i in range(0, layer2num-1):
-        weightList2 = self.weights(len(flattened), 2, iteration)
+        weightList2 = self.weights(len(flattened), 2, iteration, i)
         weightMatrix2.append(weightList2)
         #weightMatrix.append(weightList)
         a = np.dot(weightList2, flattened) + bias2
@@ -163,24 +165,25 @@ def fc(self, poolImages, testScore, iteration):
     bias3 = 0
     weightMatrix3 = []
     for i in range(0, layer3num-1):
-        weightList3 = self.weights(layer2num, 3, iteration)
+        weightList3 = self.weights(layer2num, 3, iteration, i)
         weightMatrix3.append(weightList3)
         a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
         layer3.append(a)
      
     
+    
+    #For testing images
     if (testScore == 3):
         if ((layer3[0] > layer3[1]) and (layer3[0] > layer3[2])):
-            #image is dim
             classification = "dim"
         if ((layer3[1] > layer3[0]) and (layer3[1] > layer3[2])):
-            #image is normal
             classification = "normal"
         if ((layer3[2] > layer3[0]) and (layer3[2] > layer3[1])):
-            #image is bright
             classification = "bright"
     
     
+    
+    #For training images
     if (testScore != 3): 
         
         # targetVector = [dim, normal, bright]
@@ -262,13 +265,13 @@ def fc(self, poolImages, testScore, iteration):
                     features[p][q][r] = features[p][q][r] - np.sum(featuresErrorList[p][q]) #not sure if I should use np.sum or just single error value
     
     
-    
 
     return classification #if not training set
        
     
+ 
     
-def weights(self, length, layer, iteration):
+def weights(self, length, layer, iteration, index):
     global fcLayer2Weights
     global fcLayer3Weights
     w = []
@@ -278,5 +281,9 @@ def weights(self, length, layer, iteration):
             fcLayer2Weights.append(w) 
         if (layer == 3):
             fcLayer3Weights.append(w)
-        
+    else:
+        if (layer == 2):
+            w = fcLayer2Weights[index]
+        if (layer == 3):
+            w = fcLayer3Weights[index]
     return w
