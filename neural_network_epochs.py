@@ -13,7 +13,7 @@ import numpy as np
 from scipy.misc import derivative
 
 
-def training(self, images, scores, epochs):
+def train(self, images, scores, epochs):
     
     brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -225,6 +225,26 @@ def training(self, images, scores, epochs):
 
 
 
+#Function for initializing random weights for first visit, or pointing to updated weight list for later visits
+def weights(self, length, layer, iteration, index):
+    global fcLayer2Weights
+    global fcLayer3Weights
+    w = []
+    if (iteration == 0):
+        w = np.random.randn(length)
+        if (layer == 2):
+            fcLayer2Weights.append(w) 
+        if (layer == 3):
+            fcLayer3Weights.append(w)
+    else:
+        if (layer == 2):
+            w = fcLayer2Weights[index]
+        if (layer == 3):
+            w = fcLayer3Weights[index]
+    return w
+
+
+
 #def convolution(self, testImage, testScore, iteration):
     
     #global features
@@ -269,19 +289,3 @@ def training(self, images, scores, epochs):
     
  
     
-def weights(self, length, layer, iteration, index):
-    global fcLayer2Weights
-    global fcLayer3Weights
-    w = []
-    if (iteration == 0):
-        w = np.random.randn(length)
-        if (layer == 2):
-            fcLayer2Weights.append(w) 
-        if (layer == 3):
-            fcLayer3Weights.append(w)
-    else:
-        if (layer == 2):
-            w = fcLayer2Weights[index]
-        if (layer == 3):
-            w = fcLayer3Weights[index]
-    return w
