@@ -26,37 +26,41 @@ for i in range (1, len(trainingList)):
     image = image.resize((image.size[0]/140, image.size[1]/140))
     image = image.convert("HSV")
     imageList.append(image)
-    print("converted")
+    print("converted", i)
     score = trainingList[i][1]
     scoreList.append(score)
 
-
-#Train neural network   
-learnedValues = train(imageList, scoreList, 5)
-
+#imageList[0].show()
+#print(imageList[0].getpixel((0, 0))[2])
+#Train neural network using train function in neural_network_epochs.py
+learnedValues = train(imageList, scoreList, 3)
 features = learnedValues[0]
 weights2 = learnedValues[1]
 weights3 = learnedValues[2]
 
 
+#User input and preprocessing for testing images
 print("Input an image file path: ")
-testImage = raw_input()
+testImage = Image.open(raw_input())
+testImage = testImage.resize((testImage.size[0]/140, testImage.size[1]/140))
+testImage = testImage.convert("HSV")
 
-
-
+#Run testing image through neural network in neural_network_classify.py
 classification = classify(testImage, features, weights2, weights3)
 
-
+#Print return value from classify function
+#Will implement visual output later
+print(classification)
 
 
 #image.show()
 #print(image.getpixel((14, 79))[2])
-print(image.size[0])
-print(image.size[1])
-print(math.pow(2,3))
+#print(image.size[0])
+#print(image.size[1])
+#print(math.pow(2,3))
 #print(randint(0, 255))
 
-print(scoreList[1])
+#print(scoreList[1])
 
 
 #---------------------------------------------------------------------------------------------------------------------------------------

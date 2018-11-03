@@ -12,8 +12,11 @@ import math
 import numpy as np
 from scipy.misc import derivative
 
+fcLayer2Weights = []
+fcLayer3Weights = []
 
-def train(self, images, scores, epochs):
+
+def train(images, scores, epochs):
     
     brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -35,12 +38,13 @@ def train(self, images, scores, epochs):
 
     features = [brightFilter, dimFilter, normalFilter]
 
-    fcLayer2Weights = []
-    fcLayer3Weights = []
+    global fcLayer2Weights
+    global fcLayer3Weights
     
     iteration = 0
 
     for a in range(0, epochs-1):
+        print("epoch ", a)
         for b in range(0, len(images)):
         
             #Convolution
@@ -59,7 +63,8 @@ def train(self, images, scores, epochs):
                         windowTotal = 0
                         for a in range (wY, wY+window-1):
                             for b in range (wX, wX+window-1):
-                                if (images[b].getpixel((wX, wY))[2] == filter[wY][wX]):
+                                print(features[filter][wY][wX])
+                                if (images[b].getpixel((wX, wY))[2] == features[filter][wY][wX]):
                                     windowTotal += 1
                                 else:
                                     windowTotal += -1
@@ -82,7 +87,7 @@ def train(self, images, scores, epochs):
                 poolSingle = []
                 wX = 0
                 wY = 0
-                while (wY+stride <= len(filteredImageList[e])):
+                while (wY+stride < len(filteredImageList[e])):
                     poolSingleRow=[]
                     while (wX+stride <= len(filteredImageList[e][0])):
                         uno = filteredImageList[e][wY][wX]
@@ -124,7 +129,7 @@ def train(self, images, scores, epochs):
             bias2 = 0 #???
             weightMatrix2 = []
             for i in range(0, layer2num-1):
-                weightList2 = self.weights(len(flattened), 2, iteration, i)
+                weightList2 = weights(len(flattened), 2, iteration, i)
                 weightMatrix2.append(weightList2)
                 #weightMatrix.append(weightList)
                 a = np.dot(weightList2, flattened) + bias2
@@ -136,28 +141,34 @@ def train(self, images, scores, epochs):
             layer3 = []
             bias3 = 0
             weightMatrix3 = []
-            for i in range(0, layer3num-1):
-                weightList3 = self.weights(layer2num, 3, iteration, i)
+            for i in range(0, layer3num):
+                weightList3 = weights(len(layer2), 3, iteration, i)
                 weightMatrix3.append(weightList3)
                 a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
                 layer3.append(a)
                 
             # targetVector = [dim, normal, bright]
             targetVector = []
-            if (scores[b] == 0):
+            if (scores[b] == '0\r'):
                 targetVector = [1, 0, 0] #dim
-            if (scores[b] == 1):
+            if (scores[b] == '1\r'):
                 targetVector = [0, 1, 0] #normal
-            if (scores[b] == 2):
+            if (scores[b] == '2\r'):
                 targetVector = [0, 0, 1] #bright
-                
+             
+            print(scores[b])
+            print(targetVector)
+            print(layer3)
+            
             #Output layer error calculation
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
             outputErrorList = []
             for j in range(0, layer3num-1):
-                errorA = np.array(layer3 - targetVector)
-                a = layer3[j]
-                errorB = np.array(derivative(a, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
+                errorA = np.array(layer3) - np.array(targetVector)
+                a = layer3[j] #might be something other than a single number
+                def f(a):
+                    return a
+                errorB = np.array(derivative(f, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
                 errorAB = np.multiply(errorA, errorB)
                 outputErrorList.append(errorAB)
                 
@@ -226,7 +237,7 @@ def train(self, images, scores, epochs):
 
 
 #Function for initializing random weights for first visit, or pointing to updated weight list for later visits
-def weights(self, length, layer, iteration, index):
+def weights(length, layer, iteration, index):
     global fcLayer2Weights
     global fcLayer3Weights
     w = []
