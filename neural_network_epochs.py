@@ -92,7 +92,9 @@ def train(images, scores, epochs):
                 filteredImageList.append(filteredImage)
                 
             print("filteredImagedList", filteredImageList)
-                
+            
+            
+            
             #Max-Pooling    
             stride = 2
             poolImages = []

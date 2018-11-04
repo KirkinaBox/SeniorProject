@@ -15,32 +15,76 @@ from scipy.misc import derivative
 def classify(self, image, features, weights2, weights3):
     
     #Convolution
+   # window = 5
+    #wX = 0
+    #wY = 0
+    #filteredImageList = []
+    
+    #for filter in range (0, len(features)): #for each feature
+        #filteredImage = []
+        #wX = 0
+        #wY = 0
+        #while (wY+window-1 <= len(features[filter])):
+            #filteredRow = []
+            #while (wX+window-1 <= len(features[filter][0])):
+                #windowTotal = 0
+                #for a in range (wY, wY+window-1):
+                    #for b in range (wX, wX+window-1):
+                        #if (image.getpixel((wX, wY))[2] == filter[wY][wX]):
+                            #windowTotal += 1
+                        #else:
+                            #windowTotal += -1
+                #average = windowTotal/(math.pow(window, 2))
+                #if (average < 0): #ReLU step
+                    #filteredRow.append(0)
+                #else:
+                    #filteredRow.append(average)
+                #wX += 1
+            #filteredImage.append(filteredRow)
+            #wY += 1
+        #filteredImageList.append(filteredImage)
+        
+        
     window = 5
     wX = 0
     wY = 0
     filteredImageList = []
     
-    for filter in range (0, len(features)): #for each feature
+    for filter in range(0, len(features)): #for each feature
         filteredImage = []
         wX = 0
         wY = 0
-        while (wY+window-1 <= len(features[filter])):
+        print("width", image.size[0])
+        print("height", image.size[1])
+        #while (wY+window-1 <= len(features[filter])):
+        while (wY+window-1 < image.size[1]):
             filteredRow = []
-            while (wX+window-1 <= len(features[filter][0])):
+            #while (wX+window-1 <= len(features[filter][0])):
+            while (wX+window-1 < image.size[0]):
                 windowTotal = 0
-                for a in range (wY, wY+window-1):
-                    for b in range (wX, wX+window-1):
-                        if (image.getpixel((wX, wY))[2] == filter[wY][wX]):
-                            windowTotal += 1
-                        else:
-                            windowTotal += -1
-                average = windowTotal/(math.pow(window, 2))
+                fiY = 0
+                for a in range(wY, wY+window):
+                    if (fiY < 5):
+                        fiX = 0
+                        for b in range(wX, wX+window):
+                            if (fiX < 5):
+                                print(wX, wY, a, b)
+                                #if((a == 0) and (b == 5)):
+                                #print(features[filter][wY][wX])
+                                if (image.getpixel((b, a))[2] == features[filter][fiY][fiX]):
+                                    windowTotal += 1
+                                else:
+                                    windowTotal += -1
+                                fiX += 1
+                        fiY += 1
+                average = windowTotal/(pow(window, 2))
                 if (average < 0): #ReLU step
                     filteredRow.append(0)
                 else:
                     filteredRow.append(average)
                 wX += 1
             filteredImage.append(filteredRow)
+            wX = 0
             wY += 1
         filteredImageList.append(filteredImage)
                 
