@@ -137,6 +137,7 @@ def train(images, scores, epochs):
                 
             #Weighted connections pointing to each node in layer3
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
+            #Might still need Softmax equation
             layer3num = 3
             layer3 = []
             bias3 = 0
@@ -156,36 +157,55 @@ def train(images, scores, epochs):
             if (scores[b] == '2\r'):
                 targetVector = [0, 0, 1] #bright
              
-            print(scores[b])
-            print(targetVector)
-            print(layer3)
+            #print(scores[b])
+            #print(targetVector)
+            #print(layer3)
             
             #Output layer error calculation
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
-            outputErrorList = []
-            for j in range(0, layer3num-1):
-                errorA = np.array(layer3) - np.array(targetVector)
-                a = layer3[j] #might be something other than a single number
-                def f(a):
-                    return a
-                errorB = np.array(derivative(f, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
-                errorAB = np.multiply(errorA, errorB)
-                outputErrorList.append(errorAB)
+            #outputErrorList = []
+            outputError = 0
+            for j in range(0, len(layer3)):
+                #errorA = np.array(layer3) - np.array(targetVector)
+                #a = layer3[j] #might be something other than a single number
+                #def f(a):
+                #    return a
+                #errorB = np.array(derivative(f, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
+                #errorAB = np.multiply(errorA, errorB)
+                #outputErrorList.append(errorAB)
+                #subError = 0.5 * pow((np.array(targetVector) - np.array(layer3)), 2)
+                subError = 0.5 * pow((targetVector[j] - layer3[j]), 2)
+                print(layer3[j])
+                outputError += subError
+            
+                
                 
             #Error backpropagation for layer2
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
-            layer2errorList = []
-            for k in range(0, layer2num-1):
-                errorAa = np.array(weightMatrix3).transpose()
-                errorAb = np.array(outputErrorList)
-                errorA = np.dot(errorAa, errorAb) #either np.dot or np.multiply
-                a = layer2[k]
-                errorB = np.array(derivative(a, 1.0))
-                errorAB = np.multiply(errorA, errorB)
-                layer2errorList.append(errorAB)
+            
+            #layer2errorList = []
+            #for k in range(0, layer2num):
+                #errorAa = np.array(weightMatrix3).transpose()
+            #layer2errorList = np.array(weightMatrix3).transpose()
+            layer2errorList = np.transpose(weightMatrix3)
+                #errorAb = np.array(outputErrorList)
+                #print(errorAa)
+            print(outputError)
+                #errorA = np.multiply(errorAa, outputError) #either np.dot or np.multiply
+            for e in range (0, len(layer2errorList)):
+                #layer2errorList[e] = [i * outputError for i in layer2errorList[e]]
+                for f in range(0, len(layer2errorList[e])):
+                    layer2errorList[e][f] = layer2errorList[e][f] * outputError
+                #a = layer2[k]
+                #errorB = np.array(derivative(a, 1.0))
+                #errorAB = np.multiply(errorA, errorB)
+                #layer2errorList.append(errorAB)
+             
                 
-             #Error backpropagation for convolution filters
-             #global features
+                
+            #Error backpropagation for convolution filters
+            
+            #global features
             featuresErrorList = []
             for f in range(0, len(features)):
                 singleFeatureErrorList = []
@@ -242,7 +262,7 @@ def weights(length, layer, iteration, index):
     global fcLayer3Weights
     w = []
     if (iteration == 0):
-        w = np.random.randn(length)
+        w = np.random.randn(1, length)
         if (layer == 2):
             fcLayer2Weights.append(w) 
         if (layer == 3):
