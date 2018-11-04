@@ -53,32 +53,45 @@ def train(images, scores, epochs):
             wY = 0
             filteredImageList = []
     
-            for filter in range (0, len(features)): #for each feature
+            for filter in range(0, len(features)): #for each feature
                 filteredImage = []
                 wX = 0
                 wY = 0
-                while (wY+window-1 <= len(features[filter])):
+                print("width", images[b].size[0])
+                print("height", images[b].size[1])
+                #while (wY+window-1 <= len(features[filter])):
+                while (wY+window-1 < images[b].size[1]):
                     filteredRow = []
-                    while (wX+window-1 <= len(features[filter][0])):
+                    #while (wX+window-1 <= len(features[filter][0])):
+                    while (wX+window-1 < images[b].size[0]):
                         windowTotal = 0
-                        for a in range (wY, wY+window-1):
-                            for b in range (wX, wX+window-1):
-                                print(features[filter][wY][wX])
-                                if (images[b].getpixel((wX, wY))[2] == features[filter][wY][wX]):
-                                    windowTotal += 1
-                                else:
-                                    windowTotal += -1
-                        average = windowTotal/(math.pow(window, 2))
+                        fiY = 0
+                        for a in range(wY, wY+window):
+                            if (fiY < 5):
+                                fiX = 0
+                                for b in range(wX, wX+window):
+                                    if (fiX < 5):
+                                        print(wX, wY, a, b)
+                                        #if((a == 0) and (b == 5)):
+                                            #print(features[filter][wY][wX])
+                                        if (images[b].getpixel((b, a))[2] == features[filter][fiY][fiX]):
+                                            windowTotal += 1
+                                        else:
+                                            windowTotal += -1
+                                        fiX += 1
+                                fiY += 1
+                        average = windowTotal/(pow(window, 2))
                         if (average < 0): #ReLU step
                             filteredRow.append(0)
                         else:
                             filteredRow.append(average)
                         wX += 1
                     filteredImage.append(filteredRow)
+                    wX = 0
                     wY += 1
                 filteredImageList.append(filteredImage)
                 
-             
+            print("filteredImagedList", filteredImageList)
                 
             #Max-Pooling    
             stride = 2
@@ -104,7 +117,7 @@ def train(images, scores, epochs):
                 
             
             
-            
+            #print("poolImages", poolImages)
             #Fully-Connected Layers
             
             #classification = ""
@@ -121,14 +134,15 @@ def train(images, scores, epochs):
                         #softmaxSum += node #Softmax
                         #flattened.append(node)
                         flattened.append(poolImages[l][m][n])
-                        
+            #print("flattened", flattened)
+            
             #Weighted connections pointing to each node in layer2
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
             layer2num = 10
             layer2 = []
             bias2 = 0 #???
             weightMatrix2 = []
-            for i in range(0, layer2num-1):
+            for i in range(0, layer2num):
                 weightList2 = weights(len(flattened), 2, iteration, i)
                 weightMatrix2.append(weightList2)
                 #weightMatrix.append(weightList)
@@ -147,7 +161,8 @@ def train(images, scores, epochs):
                 weightMatrix3.append(weightList3)
                 a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
                 layer3.append(a)
-                
+             
+            #print(layer3)
             # targetVector = [dim, normal, bright]
             targetVector = []
             if (scores[b] == '0\r'):
@@ -175,7 +190,7 @@ def train(images, scores, epochs):
                 #outputErrorList.append(errorAB)
                 #subError = 0.5 * pow((np.array(targetVector) - np.array(layer3)), 2)
                 subError = 0.5 * pow((targetVector[j] - layer3[j]), 2)
-                print(layer3[j])
+                #print(layer3[j])
                 outputError += subError
             
                 
@@ -262,16 +277,18 @@ def weights(length, layer, iteration, index):
     global fcLayer3Weights
     w = []
     if (iteration == 0):
-        w = np.random.randn(1, length)
+        #print(np.random.random_sample(3))
+        w.extend(np.random.random_sample(length))
         if (layer == 2):
             fcLayer2Weights.append(w) 
         if (layer == 3):
             fcLayer3Weights.append(w)
     else:
         if (layer == 2):
-            w = fcLayer2Weights[index]
+            w.extend(fcLayer2Weights[index])
         if (layer == 3):
-            w = fcLayer3Weights[index]
+            w.extend(fcLayer3Weights[index])
+    print(w)
     return w
 
 

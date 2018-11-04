@@ -32,6 +32,7 @@ for i in range (1, len(trainingList)):
 
 #imageList[0].show()
 #print(imageList[0].getpixel((0, 0))[2])
+    
 #Train neural network using train function in neural_network_epochs.py
 learnedValues = train(imageList, scoreList, 3)
 features = learnedValues[0]
