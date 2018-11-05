@@ -18,6 +18,8 @@ fcLayer3Weights = []
 
 def train(images, scores, epochs):
     
+    
+    #need to figure out why each filter produces the same random number
     brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -57,8 +59,8 @@ def train(images, scores, epochs):
                 filteredImage = []
                 wX = 0
                 wY = 0
-                print("width", images[b].size[0])
-                print("height", images[b].size[1])
+                #print("width", images[b].size[0])
+                #print("height", images[b].size[1])
                 #while (wY+window-1 <= len(features[filter])):
                 while (wY+window-1 < images[b].size[1]):
                     filteredRow = []
@@ -71,7 +73,7 @@ def train(images, scores, epochs):
                                 fiX = 0
                                 for b in range(wX, wX+window):
                                     if (fiX < 5):
-                                        print(wX, wY, a, b)
+                                        #print(wX, wY, a, b)
                                         #if((a == 0) and (b == 5)):
                                             #print(features[filter][wY][wX])
                                         if (images[b].getpixel((b, a))[2] == features[filter][fiY][fiX]):
@@ -136,7 +138,7 @@ def train(images, scores, epochs):
                         #softmaxSum += node #Softmax
                         #flattened.append(node)
                         flattened.append(poolImages[l][m][n])
-            #print("flattened", flattened)
+            print("flattened", flattened)
             
             #Weighted connections pointing to each node in layer2
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
@@ -232,8 +234,8 @@ def train(images, scores, epochs):
                         errorAa = np.array(weightMatrix2).transpose()
                         errorAb = np.array(layer2errorList)
                         errorA = np.dot(errorAa, errorAb)
-                        a = features[f][g][h]
-                        errorB = np.array(derivative(a, 1.0))
+                       # a = features[f][g][h]
+                        #errorB = np.array(derivative(a, 1.0))
                         errorAB = np.multiply(errorA, errorB)
                         singleFeatureRow.append(errorAB)
                     singleFeatureErrorList.append(singleFeatureRow)
@@ -290,10 +292,13 @@ def weights(length, layer, iteration, index):
             w.extend(fcLayer2Weights[index])
         if (layer == 3):
             w.extend(fcLayer3Weights[index])
-    print(w)
+    #print(w)
     return w
 
 
+def sigmoid(x):
+    y = 1/(1 + math.exp(-x))
+    return y
 
 #def convolution(self, testImage, testScore, iteration):
     
