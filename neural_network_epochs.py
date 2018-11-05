@@ -296,9 +296,15 @@ def weights(length, layer, iteration, index):
     return w
 
 
-def sigmoid(x):
-    y = 1/(1 + math.exp(-x))
-    return y
+def softmax(layer):
+    smSubList = []
+    for i in range(0, len(layer)):
+        smSubList.append(math.exp(layer[i]))
+    smList = []
+    for j in range(0, len(layer)):
+        sm = math.exp(layer[j])/np.sum(smSubList)
+        smList.append(sm)
+    return smList
 
 #def convolution(self, testImage, testScore, iteration):
     
