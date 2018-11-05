@@ -11,7 +11,7 @@ from random import randint
 import math
 import numpy as np
 from scipy.misc import derivative
-from scipy import signal
+from scipy import signal #scipy.signal.unit_impulse for Kronecker delta
 
 fcLayer2Weights = []
 fcLayer3Weights = []
@@ -241,10 +241,13 @@ def train(images, scores, epochs):
                         errorAa = np.array(weightMatrix2).transpose()
                         errorAb = np.array(layer2errorList)
                         errorA = np.dot(errorAa, errorAb)
-                       # a = features[f][g][h]
+                        #a = features[f][g][h]
                         #errorB = np.array(derivative(a, 1.0))
-                        errorAB = np.multiply(errorA, errorB)
-                        singleFeatureRow.append(errorAB)
+                        
+                        #---Need to figure out derivative of softmax function---
+                        #errorAB = np.multiply(errorA, errorB)
+                        #singleFeatureRow.append(errorAB)
+                        singleFeatureRow.append(errorA) #need to replace with errorAB
                     singleFeatureErrorList.append(singleFeatureRow)
                 featuresErrorList.append(singleFeatureErrorList)
                   
@@ -252,14 +255,17 @@ def train(images, scores, epochs):
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
             for n in range(0, len(weightMatrix3)):
                 for o in range(0, len(weightMatrix3[n])):
-                    gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
+                    #gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
+                    gradientA = (1/(b+1)) * outputError * np.array(layer2[o]).transpose()
                     fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA   
                     
             #Gradient descent for layer2
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
             for l in range(0, len(weightMatrix2)):
                 for m in range(0, len(weightMatrix2[l])):
-                    gradientA = np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
+                    print("layer2", layer2errorList[l])
+                    print("flattened", flattened[m])
+                    gradientA = (1/(b+1)) * np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
                     fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
                     
             #Gradient descent for convolution filters
