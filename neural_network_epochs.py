@@ -49,6 +49,7 @@ def train(images, scores, epochs):
     for a in range(0, epochs-1):
         print("epoch ", a)
         for b in range(0, len(images)):
+            print("image", b)
         
             #Convolution
             window = 5
@@ -94,7 +95,7 @@ def train(images, scores, epochs):
                     wY += 1
                 filteredImageList.append(filteredImage)
                 
-            print("filteredImagedList", filteredImageList)
+            #print("filteredImagedList", filteredImageList)
             
             
             
@@ -139,7 +140,7 @@ def train(images, scores, epochs):
                         #softmaxSum += node #Softmax
                         #flattened.append(node)
                         flattened.append(poolImages[l][m][n])
-            print("flattened", flattened)
+            #print("flattened", flattened)
             
             
             #Weighted connections pointing to each node in layer2
@@ -155,7 +156,7 @@ def train(images, scores, epochs):
                 a = np.dot(weightList2, flattened) + bias2
                 layer2.append(a)
             layer2 = softmax(layer2)
-            print("layer2", layer2)
+            #print("layer2", layer2)
                 
             
             #Weighted connections pointing to each node in layer3
@@ -216,7 +217,7 @@ def train(images, scores, epochs):
             layer2errorList = np.transpose(weightMatrix3)
                 #errorAb = np.array(outputErrorList)
                 #print(errorAa)
-            print(outputError)
+           # print(outputError)
                 #errorA = np.multiply(errorAa, outputError) #either np.dot or np.multiply
             for e in range (0, len(layer2errorList)):
                 #layer2errorList[e] = [i * outputError for i in layer2errorList[e]]
@@ -263,10 +264,11 @@ def train(images, scores, epochs):
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
             for l in range(0, len(weightMatrix2)):
                 for m in range(0, len(weightMatrix2[l])):
-                    print("layer2", layer2errorList[l])
-                    print("flattened", flattened[m])
-                    gradientA = (1/(b+1)) * np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
-                    fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
+                    #print("layer2", layer2errorList[l])
+                    #print("flattened", flattened[m])
+                    #gradientA = (1/(b+1)) * np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
+                    #fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
+                    fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - ((1/(b+1)) * outputError * fcLayer2Weights[l][m])
                     
             #Gradient descent for convolution filters
             #updatedFilterWeights = []

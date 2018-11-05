@@ -12,7 +12,7 @@ import math
 import numpy as np
 from scipy.misc import derivative
 
-def classify(self, image, features, weights2, weights3):
+def classify(image, features, weights2, weights3):
     
     #Convolution
    # window = 5
@@ -54,8 +54,8 @@ def classify(self, image, features, weights2, weights3):
         filteredImage = []
         wX = 0
         wY = 0
-        print("width", image.size[0])
-        print("height", image.size[1])
+        #print("width", image.size[0])
+        #print("height", image.size[1])
         #while (wY+window-1 <= len(features[filter])):
         while (wY+window-1 < image.size[1]):
             filteredRow = []
@@ -68,7 +68,7 @@ def classify(self, image, features, weights2, weights3):
                         fiX = 0
                         for b in range(wX, wX+window):
                             if (fiX < 5):
-                                print(wX, wY, a, b)
+                                #print(wX, wY, a, b)
                                 #if((a == 0) and (b == 5)):
                                 #print(features[filter][wY][wX])
                                 if (image.getpixel((b, a))[2] == features[filter][fiY][fiX]):
@@ -139,7 +139,7 @@ def classify(self, image, features, weights2, weights3):
     layer2 = []
     bias2 = 0 #???
     #weightMatrix2 = []
-    for i in range(0, layer2num-1):
+    for i in range(0, layer2num):
         #weightList2 = self.weights(len(flattened), 2, iteration, i)
         #weightMatrix2.append(weightList2)
         #weightMatrix.append(weightList)
@@ -154,7 +154,7 @@ def classify(self, image, features, weights2, weights3):
     layer3 = []
     bias3 = 0
     #weightMatrix3 = []
-    for i in range(0, layer3num-1):
+    for i in range(0, layer3num):
         #weightList3 = self.weights(layer2num, 3, iteration, i)
         #weightMatrix3.append(weightList3)
         a = np.dot(weights3[i], layer2) + bias3 #might need something other than a dot product
