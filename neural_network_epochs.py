@@ -140,6 +140,7 @@ def train(images, scores, epochs):
                         flattened.append(poolImages[l][m][n])
             print("flattened", flattened)
             
+            
             #Weighted connections pointing to each node in layer2
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
             layer2num = 10
@@ -152,7 +153,10 @@ def train(images, scores, epochs):
                 #weightMatrix.append(weightList)
                 a = np.dot(weightList2, flattened) + bias2
                 layer2.append(a)
+            layer2 = softmax(layer2)
+            print("layer2", layer2)
                 
+            
             #Weighted connections pointing to each node in layer3
             #source: http://neuralnetworksanddeeplearning.com/chap2.html
             #Might still need Softmax equation
@@ -165,7 +169,9 @@ def train(images, scores, epochs):
                 weightMatrix3.append(weightList3)
                 a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
                 layer3.append(a)
+            layer3 = softmax(layer3)
              
+            
             #print(layer3)
             # targetVector = [dim, normal, bright]
             targetVector = []
@@ -282,7 +288,7 @@ def weights(length, layer, iteration, index):
     w = []
     if (iteration == 0):
         #print(np.random.random_sample(3))
-        w.extend(np.random.random_sample(length))
+        w.extend(np.random.normal(length)) #Gaussian distribution
         if (layer == 2):
             fcLayer2Weights.append(w) 
         if (layer == 3):
@@ -296,6 +302,8 @@ def weights(length, layer, iteration, index):
     return w
 
 
+#Function for putting activations through softmax equation
+#source: https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
 def softmax(layer):
     smSubList = []
     for i in range(0, len(layer)):
