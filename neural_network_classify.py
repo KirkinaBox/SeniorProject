@@ -145,6 +145,7 @@ def classify(self, image, features, weights2, weights3):
         #weightMatrix.append(weightList)
         a = np.dot(weights2[i], flattened) + bias2
         layer2.append(a)
+    layer2 = softmax(layer2)
             
             
     #Weighted connections pointing to each node in layer3
@@ -158,6 +159,7 @@ def classify(self, image, features, weights2, weights3):
         #weightMatrix3.append(weightList3)
         a = np.dot(weights3[i], layer2) + bias3 #might need something other than a dot product
         layer3.append(a)
+    layer3 = softmax(layer3)
             
             
     if ((layer3[0] > layer3[1]) and (layer3[0] > layer3[2])):
@@ -169,4 +171,19 @@ def classify(self, image, features, weights2, weights3):
             
             
     return classification
+
+
+
+
+#Function for putting activations through softmax equation
+#source: https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
+def softmax(layer):
+    smSubList = []
+    for i in range(0, len(layer)):
+        smSubList.append(math.exp(layer[i]))
+    smList = []
+    for j in range(0, len(layer)):
+        sm = math.exp(layer[j])/np.sum(smSubList)
+        smList.append(sm)
+    return smList
     

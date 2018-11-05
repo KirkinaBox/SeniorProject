@@ -11,6 +11,7 @@ from random import randint
 import math
 import numpy as np
 from scipy.misc import derivative
+from scipy import signal
 
 fcLayer2Weights = []
 fcLayer3Weights = []
@@ -288,7 +289,7 @@ def weights(length, layer, iteration, index):
     w = []
     if (iteration == 0):
         #print(np.random.random_sample(3))
-        w.extend(np.random.normal(length)) #Gaussian distribution
+        w.extend(np.random.normal(0.0, 1.0, length)) #Gaussian distribution, might use randn instead
         if (layer == 2):
             fcLayer2Weights.append(w) 
         if (layer == 3):
