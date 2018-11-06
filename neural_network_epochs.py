@@ -5,8 +5,20 @@ Created on Fri Nov  2 15:25:56 2018
 
 @author: jamiecrow
 """
+'''
+Author:   Jamie Crow
+Sponsor:  Dr. Toshikazu Ikuta
+          Digital Neuroscience Laboratory
+          University of Mississippi Department of Communication Sciences & Disorders
+Semester: Fall 2018
+Class:    CSCI 487 (Senior Project)
 
-from PIL import Image
+Objective: 
+    To simulate pupillary light reflex using a convolutional neural network written from scratch                             (i.e. without the use of Keras, OpenCV, Tensorflow, etc.). The program should accept a JPEG file as user    input, and should produce visual output in the form of a circle, representing the pupil, growing or shrinking in size in response to the output of the neural network. The neural network should classify images as either dim, normal, or bright.  
+'''
+
+
+
 from random import randint
 import math
 import numpy as np
@@ -18,7 +30,6 @@ fcLayer3Weights = []
 
 
 def train(images, scores, epochs):
-    
     
     #need to figure out why each filter produces the same random number
     brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -46,12 +57,12 @@ def train(images, scores, epochs):
     
     iteration = 0
 
-    for a in range(0, epochs-1):
+    for a in range(0, epochs):
         print("epoch ", a)
         for b in range(0, len(images)):
             print("image", b)
         
-            #Convolution
+            #---Convolution step--------------------------------------------------------------------------------
             window = 5
             wX = 0
             wY = 0
@@ -61,12 +72,8 @@ def train(images, scores, epochs):
                 filteredImage = []
                 wX = 0
                 wY = 0
-                #print("width", images[b].size[0])
-                #print("height", images[b].size[1])
-                #while (wY+window-1 <= len(features[filter])):
                 while (wY+window-1 < images[b].size[1]):
                     filteredRow = []
-                    #while (wX+window-1 <= len(features[filter][0])):
                     while (wX+window-1 < images[b].size[0]):
                         windowTotal = 0
                         fiY = 0
@@ -75,9 +82,6 @@ def train(images, scores, epochs):
                                 fiX = 0
                                 for b in range(wX, wX+window):
                                     if (fiX < 5):
-                                        #print(wX, wY, a, b)
-                                        #if((a == 0) and (b == 5)):
-                                            #print(features[filter][wY][wX])
                                         if (images[b].getpixel((b, a))[2] == features[filter][fiY][fiX]):
                                             windowTotal += 1
                                         else:
@@ -94,12 +98,10 @@ def train(images, scores, epochs):
                     wX = 0
                     wY += 1
                 filteredImageList.append(filteredImage)
-                
-            #print("filteredImagedList", filteredImageList)
+            #---end Convolution step----------------------------------------------------------------------------   
+         
             
-            
-            
-            #Max-Pooling    
+            #---Max-Pooling step--------------------------------------------------------------------------------    
             stride = 2
             poolImages = []
             for e in range (0, len(filteredImageList)): #for each image
@@ -120,48 +122,37 @@ def train(images, scores, epochs):
                     wX = 0
                     wY = wY+stride
                 poolImages.append(poolSingle)
-                
+            #---end Max-Pooling step----------------------------------------------------------------------------   
             
             
-            #print("poolImages", poolImages)
-            #Fully-Connected Layers
-            
-            #classification = ""
-    
-            #softmaxSum = 0
+            #---Flattening max-pooled 3D matrix into 1D matrix--------------------------------------------------
             flattened = []
             for l in range (0, len(poolImages)):
                 for m in range (0, len(poolImages[l])):
                     for n in range (0, len(poolImages[l][m])):
-                        #don't think Softmax should be in this step
-                        #need to figure that out
-                
-                        #node = math.exp(poolImages[l][m][n]) #Softmax
-                        #softmaxSum += node #Softmax
-                        #flattened.append(node)
                         flattened.append(poolImages[l][m][n])
-            #print("flattened", flattened)
+            #---end flattening step-----------------------------------------------------------------------------
             
             
+            #---Fully-connected layer from flattened 1D matrix to 1x10 matrix-----------------------------------
             #Weighted connections pointing to each node in layer2
-            #source: http://neuralnetworksanddeeplearning.com/chap2.html
+            #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             layer2num = 10
             layer2 = []
-            bias2 = 0 #???
+            bias2 = 0 #Need to change
             weightMatrix2 = []
             for i in range(0, layer2num):
                 weightList2 = weights(len(flattened), 2, iteration, i)
                 weightMatrix2.append(weightList2)
-                #weightMatrix.append(weightList)
                 a = np.dot(weightList2, flattened) + bias2
                 layer2.append(a)
             layer2 = softmax(layer2)
-            #print("layer2", layer2)
+            #---end fully-connected layer: flattened -> layer2 step---------------------------------------------
                 
             
+            #---Fully connected layer from 1x10 matrix to 1x3 matrix--------------------------------------------
             #Weighted connections pointing to each node in layer3
-            #source: http://neuralnetworksanddeeplearning.com/chap2.html
-            #Might still need Softmax equation
+            #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             layer3num = 3
             layer3 = []
             bias3 = 0
@@ -172,9 +163,10 @@ def train(images, scores, epochs):
                 a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
                 layer3.append(a)
             layer3 = softmax(layer3)
-             
+            #---end fully-connected layer: layer2 -> layer3 step------------------------------------------------ 
             
-            #print(layer3)
+            
+            #---Defining target vector based on score from CSV file--------------------------------------------- 
             # targetVector = [dim, normal, bright]
             targetVector = []
             if (scores[b] == '0\r'):
@@ -183,32 +175,30 @@ def train(images, scores, epochs):
                 targetVector = [0, 1, 0] #normal
             if (scores[b] == '2\r'):
                 targetVector = [0, 0, 1] #bright
+            #---End target vector definition--------------------------------------------------------------------
              
-            #print(scores[b])
-            #print(targetVector)
-            #print(layer3)
             
-            #Output layer error calculation
-            #source: http://neuralnetworksanddeeplearning.com/chap2.html
+            #---Output layer error calculation------------------------------------------------------------------
+            #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             #outputErrorList = []
             outputError = 0
             for j in range(0, len(layer3)):
+                
                 #errorA = np.array(layer3) - np.array(targetVector)
                 #a = layer3[j] #might be something other than a single number
                 #def f(a):
                 #    return a
-                #errorB = np.array(derivative(f, 1.0)) #converting to np.array and using np.multiply: source: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
+                #errorB = np.array(derivative(f, 1.0)) #converting to np.array and using np.multiply: reference: https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
                 #errorAB = np.multiply(errorA, errorB)
                 #outputErrorList.append(errorAB)
                 #subError = 0.5 * pow((np.array(targetVector) - np.array(layer3)), 2)
                 subError = 0.5 * pow((targetVector[j] - layer3[j]), 2)
-                #print(layer3[j])
                 outputError += subError
-            
+            #---end output layer error calculation--------------------------------------------------------------
                 
                 
-            #Error backpropagation for layer2
-            #source: http://neuralnetworksanddeeplearning.com/chap2.html
+            #---Error backpropagation for layer2----------------------------------------------------------------
+            #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             
             #layer2errorList = []
             #for k in range(0, layer2num):
@@ -227,12 +217,10 @@ def train(images, scores, epochs):
                 #errorB = np.array(derivative(a, 1.0))
                 #errorAB = np.multiply(errorA, errorB)
                 #layer2errorList.append(errorAB)
-             
+            #---end layer2 error backpropagation-----------------------------------------------------------------  
                 
                 
-            #Error backpropagation for convolution filters
-            
-            #global features
+            #---Error backpropagation for convolution filters---------------------------------------------------
             featuresErrorList = []
             for f in range(0, len(features)):
                 singleFeatureErrorList = []
@@ -245,23 +233,27 @@ def train(images, scores, epochs):
                         #a = features[f][g][h]
                         #errorB = np.array(derivative(a, 1.0))
                         
-                        #---Need to figure out derivative of softmax function---
+                        # ***Need to figure out derivative of softmax function***
                         #errorAB = np.multiply(errorA, errorB)
                         #singleFeatureRow.append(errorAB)
                         singleFeatureRow.append(errorA) #need to replace with errorAB
                     singleFeatureErrorList.append(singleFeatureRow)
                 featuresErrorList.append(singleFeatureErrorList)
-                  
-            #Gradient descent for output layer
-            #source: http://neuralnetworksanddeeplearning.com/chap2.html
+            #---end convolution filters' error backpropagation--------------------------------------------------
+            
+            
+            #---Gradient descent for output layer---------------------------------------------------------------
+            #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             for n in range(0, len(weightMatrix3)):
                 for o in range(0, len(weightMatrix3[n])):
                     #gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
                     gradientA = (1/(b+1)) * outputError * np.array(layer2[o]).transpose()
                     fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA   
-                    
-            #Gradient descent for layer2
-            #source: http://neuralnetworksanddeeplearning.com/chap2.html
+            #---end output layer gradient descent---------------------------------------------------------------
+                
+            
+            #---Gradient descent for layer2---------------------------------------------------------------------
+            #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             for l in range(0, len(weightMatrix2)):
                 for m in range(0, len(weightMatrix2[l])):
                     #print("layer2", layer2errorList[l])
@@ -269,8 +261,10 @@ def train(images, scores, epochs):
                     #gradientA = (1/(b+1)) * np.dot(np.array(layer2errorList[l][m]), np.array(flattened[m]).transpose())
                     #fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
                     fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - ((1/(b+1)) * outputError * fcLayer2Weights[l][m])
-                    
-            #Gradient descent for convolution filters
+            #---end layer2 gradient descent---------------------------------------------------------------------
+              
+            
+            #---Gradient descent for convolution filters--------------------------------------------------------
             #updatedFilterWeights = []
             for p in range(0, len(features)):
                 #singleFilter = []
@@ -278,25 +272,28 @@ def train(images, scores, epochs):
                     #singleFilterRow = []
                     for r in range(0, len(features[p][q])):
                         features[p][q][r] = features[p][q][r] - np.sum(featuresErrorList[p][q]) #not sure if I should use np.sum or just single error value
+            #---end convolution filters' gradient descent-------------------------------------------------------
              
                 
-                
+            #increase iteration variable for each image    
             iteration += 1
+        #increase iteration variable for each epoch
         iteration += 1
-        
+    
+    #return learned weights for use in neural_network_classify.classify function
     learnedValues = [features, fcLayer2Weights, fcLayer3Weights]
-    return learnedValues          
+    return learnedValues    
+#---end of train function---------------------------------------------------------------------------------------      
 
 
 
 
-#Function for initializing random weights for first visit, or pointing to updated weight list for later visits
+#---Function for initializing random weights for first visit, or pointing to updated weight list for later visits
 def weights(length, layer, iteration, index):
     global fcLayer2Weights
     global fcLayer3Weights
     w = []
     if (iteration == 0):
-        #print(np.random.random_sample(3))
         w.extend(np.random.normal(0.0, 1.0, length)) #Gaussian distribution, might use randn instead
         if (layer == 2):
             fcLayer2Weights.append(w) 
@@ -307,12 +304,14 @@ def weights(length, layer, iteration, index):
             w.extend(fcLayer2Weights[index])
         if (layer == 3):
             w.extend(fcLayer3Weights[index])
-    #print(w)
     return w
+#---end weights function----------------------------------------------------------------------------------------
 
 
-#Function for putting activations through softmax equation
-#source: https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
+
+
+#---Function for putting activations through softmax equation---------------------------------------------------
+#reference: https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
 def softmax(layer):
     smSubList = []
     for i in range(0, len(layer)):
@@ -322,42 +321,8 @@ def softmax(layer):
         sm = math.exp(layer[j])/np.sum(smSubList)
         smList.append(sm)
     return smList
+#---end softmax function----------------------------------------------------------------------------------------
 
-#def convolution(self, testImage, testScore, iteration):
-    
-    #global features
-    #stride = 1
-   
-    
-                
-    #return(self.pooling(filteredImageList, testScore, iteration)) #don't think this'll work without pooling() attached to a parent
-    
-    
-#def relu():
-    #Rectified Linear Unit (ReLU) step goes here
-    #swap negative numbers for 0
-    #source: https://brohrer.github.io/how_convolutional_neural_networks_work.html
-    
-#def pooling(self, listOfImages, testScore, iteration):
-    
-     
-    #return(self.fc(poolImages, testScore, iteration))
-
-
-
-            
-        
-#def fc(self, poolImages, testScore, iteration):
-    #Fully Connected layer goes here (I think)
-    
-    #will probably use Softmax function
-        #sources: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
-        #         http://cs231n.github.io/linear-classify/#softmax   
-        #         https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
-    
-    #Flattening cube (poolImages) into vector
-    #source: https://www.quora.com/What-is-the-meaning-of-flattening-step-in-a-convolutional-neural-network
-    #        answer by Alex Coninx
     
     
     

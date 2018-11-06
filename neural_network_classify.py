@@ -5,6 +5,19 @@ Created on Fri Nov  2 16:42:21 2018
 
 @author: jamiecrow
 """
+'''
+Author:   Jamie Crow
+Sponsor:  Dr. Toshikazu Ikuta
+          Digital Neuroscience Laboratory
+          University of Mississippi Department of Communication Sciences & Disorders
+Semester: Fall 2018
+Class:    CSCI 487 (Senior Project)
+
+Objective: 
+    To simulate pupillary light reflex using a convolutional neural network written from scratch                             (i.e. without the use of Keras, OpenCV, Tensorflow, etc.). The program should accept a JPEG file as user    input, and should produce visual output in the form of a circle, representing the pupil, growing or shrinking in size in response to the output of the neural network. The neural network should classify images as either dim, normal, or bright.  
+'''
+
+
 
 from PIL import Image
 from random import randint
@@ -13,38 +26,8 @@ import numpy as np
 from scipy.misc import derivative
 
 def classify(image, features, weights2, weights3):
-    
-    #Convolution
-   # window = 5
-    #wX = 0
-    #wY = 0
-    #filteredImageList = []
-    
-    #for filter in range (0, len(features)): #for each feature
-        #filteredImage = []
-        #wX = 0
-        #wY = 0
-        #while (wY+window-1 <= len(features[filter])):
-            #filteredRow = []
-            #while (wX+window-1 <= len(features[filter][0])):
-                #windowTotal = 0
-                #for a in range (wY, wY+window-1):
-                    #for b in range (wX, wX+window-1):
-                        #if (image.getpixel((wX, wY))[2] == filter[wY][wX]):
-                            #windowTotal += 1
-                        #else:
-                            #windowTotal += -1
-                #average = windowTotal/(math.pow(window, 2))
-                #if (average < 0): #ReLU step
-                    #filteredRow.append(0)
-                #else:
-                    #filteredRow.append(average)
-                #wX += 1
-            #filteredImage.append(filteredRow)
-            #wY += 1
-        #filteredImageList.append(filteredImage)
-        
-        
+
+    #Convolution step
     window = 5
     wX = 0
     wY = 0

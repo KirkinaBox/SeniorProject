@@ -5,23 +5,36 @@ Created on Sun Oct  7 23:41:55 2018
 
 @author: jamiecrow
 """
+'''
+Author:   Jamie Crow
+Sponsor:  Dr. Toshikazu Ikuta
+          Digital Neuroscience Laboratory
+          University of Mississippi Department of Communication Sciences & Disorders
+Semester: Fall 2018
+Class:    CSCI 487 (Senior Project)
+
+Objective: 
+    To simulate pupillary light reflex using a convolutional neural network written from scratch                             (i.e. without the use of Keras, OpenCV, Tensorflow, etc.). The program should accept a JPEG file as user    input, and should produce visual output in the form of a circle, representing the pupil, growing or shrinking in size in response to the output of the neural network. The neural network should classify images as either dim, normal, or bright.  
+'''
+
+
 
 from PIL import Image
-from random import randint
-import math
 from neural_network_epochs import train
 from neural_network_classify import classify
 
+
+#Reading in CSV file with image file paths in one column and scores in a second column
 file = open("TrainingImages_withScores.csv", "r")
 trainingList = file.read()
 trainingList = trainingList.split("\n")
-#print(trainingList)
 
+
+#Processing CSV file by opening each file path, shrinking each image, converting the color mode of each image from RGB to HSV, and adding each image and each score to a corresponding list
 imageList = []
 scoreList = []
 for i in range (1, len(trainingList)):
     trainingList[i] = trainingList[i].split(",")
-    #print(trainingList[i][0])
     image = Image.open(trainingList[i][0])
     image = image.resize((image.size[0]/140, image.size[1]/140))
     image = image.convert("HSV")
@@ -30,9 +43,7 @@ for i in range (1, len(trainingList)):
     score = trainingList[i][1]
     scoreList.append(score)
 
-#imageList[0].show()
-#print(imageList[0].getpixel((0, 0))[2])
-    
+   
 #Train neural network using train function in neural_network_epochs.py
 learnedValues = train(imageList, scoreList, 3)
 features = learnedValues[0]
@@ -46,25 +57,16 @@ testImage = Image.open(raw_input())
 testImage = testImage.resize((testImage.size[0]/140, testImage.size[1]/140))
 testImage = testImage.convert("HSV")
 
+
 #Run testing image through neural network in neural_network_classify.py
 classification = classify(testImage, features, weights2, weights3)
+
 
 #Print return value from classify function
 #Will implement visual output later
 print(classification)
 
 
-#image.show()
-#print(image.getpixel((14, 79))[2])
-#print(image.size[0])
-#print(image.size[1])
-#print(math.pow(2,3))
-#print(randint(0, 255))
-
-#print(scoreList[1])
-
-
-#---------------------------------------------------------------------------------------------------------------------------------------
 
 
 
