@@ -24,6 +24,23 @@ from neural_network_epochs import train
 from neural_network_classify import classify
 
 
+def userInput():
+    print("Input an image file path: ")
+    #chosen = raw_input()
+    testImage = Image.open(raw_input())
+    testImage = testImage.resize((testImage.size[0]/140, testImage.size[1]/140))
+    testImage = testImage.convert("HSV")
+    classification = classify(testImage, features, weights2, weights3)
+    print(classification)
+    print("Next image, or type 'stop' to stop: ")
+    if (raw_input() == "stop"):
+        return
+    
+    userInput()
+    #return
+
+
+
 #Reading in CSV file with image file paths in one column and scores in a second column
 file = open("TrainingImages_withScores.csv", "r")
 trainingList = file.read()
@@ -50,9 +67,13 @@ features = learnedValues[0]
 weights2 = learnedValues[1]
 weights3 = learnedValues[2]
 
+print(features)
+#userInput()
+
 
 #User input and preprocessing for testing images
 print("Input an image file path: ")
+#while (raw_input() != "stop"):
 testImage = Image.open(raw_input())
 testImage = testImage.resize((testImage.size[0]/140, testImage.size[1]/140))
 testImage = testImage.convert("HSV")
@@ -65,6 +86,8 @@ classification = classify(testImage, features, weights2, weights3)
 #Print return value from classify function
 #Will implement visual output later
 print(classification)
+    
+#print("Next image: ")
 
 
 
