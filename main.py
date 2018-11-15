@@ -22,23 +22,74 @@ Objective:
 from PIL import Image
 from neural_network_epochs import train
 from neural_network_classify import classify
+import numpy as np
+from matplotlib import pyplot
+from matplotlib import animation
+import mimetypes
+from os import path
 
 
 def userInput():
+    #if (iteration == 1):
     print("Input an image file path: ")
+    filePath = raw_input()
+    
+    #fileType = mimetypes.guess_type(filePath)
+    #print(fileType[0])
+    #if (fileType[0] != "image/jpeg"):
+        #print("Invalid file type. Please input a filepath ending in .jpeg")
+        #filePath = raw_input()
     #chosen = raw_input()
-    testImage = Image.open(raw_input())
+    filePath = imageCheck(filePath)
+    #print(filePath)
+    testImage = Image.open(filePath)
+    
     testImage = testImage.resize((testImage.size[0]/140, testImage.size[1]/140))
     testImage = testImage.convert("HSV")
     classification = classify(testImage, features, weights2, weights3)
     print(classification)
-    print("Next image, or type 'stop' to stop: ")
+    eye(classification)
+    #iteration += 1
+    print("Enter to continue, or type 'stop' to stop: ")
     if (raw_input() == "stop"):
         return
-    
-    userInput()
+    else:
+        userInput()
     #return
 
+
+def eye(classification):
+    pupilSize = 0
+    if (classification == "dim"):
+        pupilSize = 1.0
+    if (classification == "normal"):
+        pupilSize = 0.75
+    if (classification == "bright"):
+        pupilSize = 0.5
+    #pupil = 0.75
+    pupil = pyplot.Circle((0, 0), radius=pupilSize, color="black")
+    iris = pyplot.Circle((0, 0), radius=1.5, color="saddlebrown")
+    pyplot.gca().add_patch(iris)
+    pyplot.gca().add_patch(pupil)
+    pyplot.axis("scaled")
+    pyplot.axis("off")
+    pyplot.show()
+
+
+    
+def imageCheck(filePath):
+    fileType = mimetypes.guess_type(filePath)
+    returnFile = filePath
+    #print(fileType[0])
+    if (fileType[0] != "image/jpeg"):
+        print("Invalid file type. Please input a file path ending in .jpeg")
+        newFilePath = raw_input()
+        returnFile = imageCheck(newFilePath)
+    
+    
+    return returnFile
+    
+    
 
 
 #Reading in CSV file with image file paths in one column and scores in a second column
@@ -68,24 +119,33 @@ weights2 = learnedValues[1]
 weights3 = learnedValues[2]
 
 print(features)
-#userInput()
+#iteration = 1
+userInput()
+
+#pyplot.axes()
+#pupil = 0.75
+#circle = pyplot.Circle((0, 0), radius=pupil, color="black")
+#pyplot.gca().add_patch(circle)
+#pyplot.axis("scaled")
+#pyplot.show()
+
 
 
 #User input and preprocessing for testing images
-print("Input an image file path: ")
+#print("Input an image file path: ")
 #while (raw_input() != "stop"):
-testImage = Image.open(raw_input())
-testImage = testImage.resize((testImage.size[0]/140, testImage.size[1]/140))
-testImage = testImage.convert("HSV")
+#testImage = Image.open(raw_input())
+#testImage = testImage.resize((testImage.size[0]/140, testImage.size[1]/140))
+#testImage = testImage.convert("HSV")
 
 
 #Run testing image through neural network in neural_network_classify.py
-classification = classify(testImage, features, weights2, weights3)
+#classification = classify(testImage, features, weights2, weights3)
 
 
 #Print return value from classify function
 #Will implement visual output later
-print(classification)
+#print(classification)
     
 #print("Next image: ")
 

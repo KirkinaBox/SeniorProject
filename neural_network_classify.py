@@ -134,10 +134,14 @@ def classify(image, features, weights2, weights3):
     classification = ""      
     if ((layer3[0] > layer3[1]) and (layer3[0] > layer3[2])):
         classification = "dim"
-    if ((layer3[1] > layer3[0]) and (layer3[1] > layer3[2])):
+    elif ((layer3[1] >= layer3[0]) and (layer3[1] >= layer3[2])):
         classification = "normal"
-    if ((layer3[2] > layer3[0]) and (layer3[2] > layer3[1])):
+    elif ((layer3[2] > layer3[0]) and (layer3[2] > layer3[1])):
         classification = "bright"
+    else:
+        classification = "normal1"
+    
+    
     #---end classification step---------------------------------------------------------------------------------
             
             
