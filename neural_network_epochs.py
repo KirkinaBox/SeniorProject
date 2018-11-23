@@ -39,18 +39,21 @@ def train(images, scores, epochs):
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)]]
+    print("BrightFilter", brightFilter)
                 
     dimFilter =    [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)]]
+    print("DimFilter", dimFilter)
 
     normalFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)]]
+    print("NormalFilter", normalFilter)
 
     features = [brightFilter, dimFilter, normalFilter]
 
@@ -63,7 +66,7 @@ def train(images, scores, epochs):
     for a in range(0, epochs): #Number of times whole training set will go through network
         print("epoch ", a)
         for b in range(0, len(images)): #for each image in the training set
-            print("image", b)
+            #print("image", b)
         
             #---Convolution step--------------------------------------------------------------------------------
             window = 5
@@ -319,6 +322,7 @@ def train(images, scores, epochs):
             iteration += 1
         #increase iteration variable for each epoch
         iteration += 1
+        print("Features", features)
     
     #return learned weights for use in neural_network_classify.classify function
     learnedValues = [features, fcLayer2Weights, fcLayer3Weights]

@@ -129,7 +129,7 @@ def classify(image, features, weights2, weights3):
     layer3 = softmax(layer3)
     #---end fully-connected layer: layer2 -> layer3 step--------------------------------------------------------
     
-     
+    print("OutputLayer", layer3)
     #---Classification step-------------------------------------------------------------------------------------   
     classification = ""      
     if ((layer3[0] > layer3[1]) and (layer3[0] > layer3[2])):

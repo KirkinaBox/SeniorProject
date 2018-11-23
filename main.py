@@ -35,6 +35,7 @@ def userInput():
     testImage = ""
     
     
+    #Error handling to check for valid file type and valid file name
     while (testImage == ""):
         try:
             filePath = raw_input()
@@ -59,6 +60,7 @@ def userInput():
     #return
 
 
+#Function to generate visual output
 def eye(classification):
     pupilSize = 0
     if (classification == "dim"):
@@ -77,7 +79,8 @@ def eye(classification):
     pyplot.show()
 
 
-    
+
+#Function to check if input is a jpeg file    
 def imageCheck(filePath):
     fileType = mimetypes.guess_type(filePath)
     returnFile = filePath
@@ -119,7 +122,7 @@ features = learnedValues[0]
 weights2 = learnedValues[1]
 weights3 = learnedValues[2]
 
-print(features)
+#print(features)
 #iteration = 1
 userInput()
 
