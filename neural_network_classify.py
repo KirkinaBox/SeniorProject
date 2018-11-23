@@ -26,10 +26,10 @@ import numpy as np
 from scipy.misc import derivative
 
 
-#---Function for running an input image through the neural network and returning a classification---------------
+#---Function for running an input image through the neural network and returning a classification---
 def classify(image, features, weights2, weights3):
 
-    #---Convolution step----------------------------------------------------------------------------------------
+    #---Convolution step---
     window = 5
     wX = 0
     wY = 0
@@ -65,10 +65,10 @@ def classify(image, features, weights2, weights3):
             wX = 0
             wY += 1
         filteredImageList.append(filteredImage)
-    #---End convolution step------------------------------------------------------------------------------------
+    #---End convolution step---
                 
                         
-    #---Max-Pooling step----------------------------------------------------------------------------------------  
+    #---Max-Pooling step---  
     stride = 2
     poolImages = []
     for e in range (0, len(filteredImageList)): #for each image
@@ -89,22 +89,22 @@ def classify(image, features, weights2, weights3):
             wX = 0
             wY = wY+stride
         poolImages.append(poolSingle)
-    #---end max-pooling step------------------------------------------------------------------------------------
+    #---end max-pooling step---
             
             
-    #---Fully-connected layers----------------------------------------------------------------------------------
-    #-----------------------------------------------------------------------------------------------------------
+    #---Fully-connected layers---
+    #----------------------------
     
-    #---Flattening max-pooled 3D matrix into 1D matrix----------------------------------------------------------
+    #---Flattening max-pooled 3D matrix into 1D matrix---
     flattened = []
     for l in range (0, len(poolImages)):
         for m in range (0, len(poolImages[l])):
             for n in range (0, len(poolImages[l][m])):
                 flattened.append(poolImages[l][m][n])
-    #---end flattening step-------------------------------------------------------------------------------------
+    #---end flattening step---
                     
     
-    #---Fully-connected layer from flattened 1D matrix to 1x10 matrix-------------------------------------------                
+    #---Fully-connected layer from flattened 1D matrix to 1x10 matrix---                
     #Weighted connections pointing to each node in layer2
     #reference: http://neuralnetworksanddeeplearning.com/chap2.html
     layer2num = 10
@@ -114,10 +114,10 @@ def classify(image, features, weights2, weights3):
         a = np.dot(weights2[i], flattened) + bias2
         layer2.append(a)
     layer2 = softmax(layer2)
-    #---end fully-connected layer: flattened -> layer2 step-----------------------------------------------------
+    #---end fully-connected layer: flattened -> layer2 step---
             
      
-    #---Fully connected layer from 1x10 matrix to 1x3 matrix----------------------------------------------------       
+    #---Fully connected layer from 1x10 matrix to 1x3 matrix---       
     #Weighted connections pointing to each node in layer3
     #reference: http://neuralnetworksanddeeplearning.com/chap2.html
     layer3num = 3
@@ -127,10 +127,10 @@ def classify(image, features, weights2, weights3):
         a = np.dot(weights3[i], layer2) + bias3 #might need something other than a dot product
         layer3.append(a)
     layer3 = softmax(layer3)
-    #---end fully-connected layer: layer2 -> layer3 step--------------------------------------------------------
+    #---end fully-connected layer: layer2 -> layer3 step---
     
     print("OutputLayer", layer3)
-    #---Classification step-------------------------------------------------------------------------------------   
+    #---Classification step---   
     classification = ""      
     if ((layer3[0] > layer3[1]) and (layer3[0] > layer3[2])):
         classification = "dim"
@@ -142,16 +142,16 @@ def classify(image, features, weights2, weights3):
         classification = "normal1"
     
     
-    #---end classification step---------------------------------------------------------------------------------
+    #---end classification step---
             
             
     return classification
-#---end of classify function------------------------------------------------------------------------------------
+#---end of classify function---
 
 
 
 
-#---Function for putting activations through softmax equation---------------------------------------------------
+#---Function for putting activations through softmax equation---
 #source: https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
 def softmax(layer):
     smSubList = []
@@ -162,5 +162,5 @@ def softmax(layer):
         sm = math.exp(layer[j])/np.sum(smSubList)
         smList.append(sm)
     return smList
-#---end of softmax function-------------------------------------------------------------------------------------
+#---end of softmax function---
     

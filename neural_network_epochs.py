@@ -29,10 +29,10 @@ fcLayer2Weights = []
 fcLayer3Weights = []
 
 
-#---Function for training the neural network--------------------------------------------------------------------
+#---Function for training the neural network---
 def train(images, scores, epochs):
     
-    #---Random filter weight initialization (0-255 is the range for HSV values)---------------------------------
+    #---Random filter weight initialization (0-255 is the range for HSV values)---
     #need to figure out why each filter produces the same random number
     brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -68,7 +68,7 @@ def train(images, scores, epochs):
         for b in range(0, len(images)): #for each image in the training set
             #print("image", b)
         
-            #---Convolution step--------------------------------------------------------------------------------
+            #---Convolution step---
             window = 5
             wX = 0
             wY = 0
@@ -104,10 +104,10 @@ def train(images, scores, epochs):
                     wX = 0
                     wY += 1
                 filteredImageList.append(filteredImage)
-            #---end Convolution step----------------------------------------------------------------------------   
+            #---end Convolution step---   
          
             
-            #---Max-Pooling step--------------------------------------------------------------------------------    
+            #---Max-Pooling step---    
             stride = 2
             poolImages = []
             for e in range (0, len(filteredImageList)): #for each image
@@ -128,22 +128,22 @@ def train(images, scores, epochs):
                     wX = 0
                     wY = wY+stride
                 poolImages.append(poolSingle)
-            #---end Max-Pooling step----------------------------------------------------------------------------   
+            #---end Max-Pooling step---   
             
             
-            #---Fully-connected layers--------------------------------------------------------------------------
-            #---------------------------------------------------------------------------------------------------
+            #---Fully-connected layers----
+            #-----------------------------
             
-            #---Flattening max-pooled 3D matrix into 1D matrix--------------------------------------------------
+            #---Flattening max-pooled 3D matrix into 1D matrix---
             flattened = []
             for l in range (0, len(poolImages)):
                 for m in range (0, len(poolImages[l])):
                     for n in range (0, len(poolImages[l][m])):
                         flattened.append(poolImages[l][m][n])
-            #---end flattening step-----------------------------------------------------------------------------
+            #---end flattening step---
             
             
-            #---Fully-connected layer from flattened 1D matrix to 1x10 matrix-----------------------------------
+            #---Fully-connected layer from flattened 1D matrix to 1x10 matrix---
             #Weighted connections pointing to each node in layer2
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             layer2num = 10
@@ -156,10 +156,10 @@ def train(images, scores, epochs):
                 a = np.dot(weightList2, flattened) + bias2
                 layer2.append(a)
             layer2 = softmax(layer2)
-            #---end fully-connected layer: flattened -> layer2 step---------------------------------------------
+            #---end fully-connected layer: flattened -> layer2 step---
                 
             
-            #---Fully connected layer from 1x10 matrix to 1x3 matrix--------------------------------------------
+            #---Fully connected layer from 1x10 matrix to 1x3 matrix---
             #Weighted connections pointing to each node in layer3
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             layer3num = 3
@@ -172,10 +172,10 @@ def train(images, scores, epochs):
                 a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
                 layer3.append(a)
             layer3 = softmax(layer3)
-            #---end fully-connected layer: layer2 -> layer3 step------------------------------------------------ 
+            #---end fully-connected layer: layer2 -> layer3 step--- 
             
             
-            #---Defining target vector based on score from CSV file--------------------------------------------- 
+            #---Defining target vector based on score from CSV file--- 
             # targetVector = [dim, normal, bright]
             targetVector = []
             if (scores[b] == '0\r'):
@@ -184,10 +184,10 @@ def train(images, scores, epochs):
                 targetVector = [0, 1, 0] #normal
             if (scores[b] == '2\r'):
                 targetVector = [0, 0, 1] #bright
-            #---End target vector definition--------------------------------------------------------------------
+            #---End target vector definition---
              
             
-            #---Output layer error calculation------------------------------------------------------------------
+            #---Output layer error calculation---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             #outputErrorList = []
             outputError = 0
@@ -208,10 +208,10 @@ def train(images, scores, epochs):
                 
                 subError = 0.5 * pow((targetVector[j] - layer3[j]), 2)
                 outputError += subError
-            #---end output layer error calculation--------------------------------------------------------------
+            #---end output layer error calculation---
                 
                 
-            #---Error backpropagation for layer2----------------------------------------------------------------
+            #---Error backpropagation for layer2---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             
             
@@ -240,10 +240,10 @@ def train(images, scores, epochs):
                 #errorB = np.array(derivative(a, 1.0))
                 #errorAB = np.multiply(errorA, errorB)
                 #layer2errorList.append(errorAB)
-            #---end layer2 error backpropagation-----------------------------------------------------------------  
+            #---end layer2 error backpropagation---  
                 
                 
-            #---Error backpropagation for convolution filters---------------------------------------------------
+            #---Error backpropagation for convolution filters---
             featuresErrorList = []
             for f in range(0, len(features)):
                 singleFeatureErrorList = []
@@ -268,10 +268,10 @@ def train(images, scores, epochs):
                         singleFeatureRow.append(errorA) #need to replace with errorAB
                     singleFeatureErrorList.append(singleFeatureRow)
                 featuresErrorList.append(singleFeatureErrorList)
-            #---end convolution filters' error backpropagation--------------------------------------------------
+            #---end convolution filters' error backpropagation---
             
             
-            #---Gradient descent for output layer---------------------------------------------------------------
+            #---Gradient descent for output layer---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             for n in range(0, len(weightMatrix3)):
                 for o in range(0, len(weightMatrix3[n])):
@@ -284,10 +284,10 @@ def train(images, scores, epochs):
                     
                     gradientA = (1/(b+1)) * outputError * np.array(layer2[o]).transpose()
                     fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA   
-            #---end output layer gradient descent---------------------------------------------------------------
+            #---end output layer gradient descent---
                 
             
-            #---Gradient descent for layer2---------------------------------------------------------------------
+            #---Gradient descent for layer2---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             for l in range(0, len(weightMatrix2)):
                 for m in range(0, len(weightMatrix2[l])):
@@ -302,10 +302,10 @@ def train(images, scores, epochs):
                     
                     
                     fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - ((1/(b+1)) * outputError * fcLayer2Weights[l][m])
-            #---end layer2 gradient descent---------------------------------------------------------------------
+            #---end layer2 gradient descent---
               
             
-            #---Gradient descent for convolution filters--------------------------------------------------------
+            #---Gradient descent for convolution filters---
             # ***Note: This algorithm might need editing and has code commented out for future reference***
             
             #updatedFilterWeights = []
@@ -315,7 +315,7 @@ def train(images, scores, epochs):
                     #singleFilterRow = []
                     for r in range(0, len(features[p][q])):
                         features[p][q][r] = features[p][q][r] - np.sum(featuresErrorList[p][q]) #not sure if I should use np.sum or just single error value
-            #---end convolution filters' gradient descent-------------------------------------------------------
+            #---end convolution filters' gradient descent---
              
                 
             #increase iteration variable for each image    
@@ -327,7 +327,7 @@ def train(images, scores, epochs):
     #return learned weights for use in neural_network_classify.classify function
     learnedValues = [features, fcLayer2Weights, fcLayer3Weights]
     return learnedValues    
-#---end of train function---------------------------------------------------------------------------------------      
+#---end of train function---      
 
 
 
@@ -349,12 +349,12 @@ def weights(length, layer, iteration, index):
         if (layer == 3):
             w.extend(fcLayer3Weights[index])
     return w
-#---end weights function----------------------------------------------------------------------------------------
+#---end weights function---
 
 
 
 
-#---Function for putting activations through softmax equation---------------------------------------------------
+#---Function for putting activations through softmax equation---
 #reference: https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
 def softmax(layer):
     smSubList = []
@@ -365,7 +365,7 @@ def softmax(layer):
         sm = math.exp(layer[j])/np.sum(smSubList)
         smList.append(sm)
     return smList
-#---end softmax function----------------------------------------------------------------------------------------
+#---end softmax function---
 
     
     
