@@ -32,17 +32,18 @@ from os import path
 def userInput():
     #if (iteration == 1):
     print("Input an image file path: ")
-    filePath = raw_input()
+    testImage = ""
     
-    #fileType = mimetypes.guess_type(filePath)
-    #print(fileType[0])
-    #if (fileType[0] != "image/jpeg"):
-        #print("Invalid file type. Please input a filepath ending in .jpeg")
-        #filePath = raw_input()
-    #chosen = raw_input()
-    filePath = imageCheck(filePath)
-    #print(filePath)
-    testImage = Image.open(filePath)
+    
+    while (testImage == ""):
+        try:
+            filePath = raw_input()
+            filePath = imageCheck(filePath)
+            testImage = Image.open(filePath)
+        #break
+        except IOError:
+            print("This file cannot be found. Please input a valid file name: ")
+        
     
     testImage = testImage.resize((testImage.size[0]/140, testImage.size[1]/140))
     testImage = testImage.convert("HSV")
@@ -50,8 +51,8 @@ def userInput():
     print(classification)
     eye(classification)
     #iteration += 1
-    print("Enter to continue, or type 'stop' to stop: ")
-    if (raw_input() == "stop"):
+    print("Enter to continue, or type 'exit' to stop: ")
+    if (raw_input() == "exit"):
         return
     else:
         userInput()
