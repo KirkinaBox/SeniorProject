@@ -124,7 +124,7 @@ def imageCheck(filePath):
     returnFile = filePath
     #print(fileType[0])
     if (fileType[0] != "image/jpeg"):
-        print("Invalid file type. Please input a file path ending in .jpeg")
+        print("Invalid file type. Please input a file path ending in .jpeg or .jpg")
         newFilePath = raw_input()
         returnFile = imageCheck(newFilePath)
     

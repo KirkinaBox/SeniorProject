@@ -174,7 +174,10 @@ def train(images, scores, epochs):
                 weightList2 = weights(len(flattened), 2, iteration, i)
                 weightMatrix2.append(weightList2)
                 a = np.dot(weightList2, flattened) + bias2
+                if (a < 0): # ReLU
+                    a = 0
                 layer2.append(a)
+                
             layer2 = softmax(layer2)
             #---end fully-connected layer: flattened -> layer2 step---
                 
@@ -190,6 +193,8 @@ def train(images, scores, epochs):
                 weightList3 = weights(len(layer2), 3, iteration, i)
                 weightMatrix3.append(weightList3)
                 a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
+                if (a < 0): #ReLU
+                    a = 0
                 layer3.append(a)
             layer3 = softmax(layer3)
             #---end fully-connected layer: layer2 -> layer3 step--- 
@@ -210,8 +215,8 @@ def train(images, scores, epochs):
             #---Output layer error calculation---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
             #outputErrorList = []
-            outputError = 0
-            for j in range(0, len(layer3)):
+            #outputError = 0
+            #for j in range(0, len(layer3)):
                 
                 
                 # ***Note: This algorithm might need editing and has code commented out for future reference***
@@ -226,8 +231,14 @@ def train(images, scores, epochs):
                 #subError = 0.5 * pow((np.array(targetVector) - np.array(layer3)), 2)
                 
                 
-                subError = 0.5 * pow((targetVector[j] - layer3[j]), 2)
-                outputError += subError
+                #subError = 0.5 * pow((targetVector[j] - layer3[j]), 2)
+                #outputError += subError
+                
+                
+            #Cross-entropy calculation for output layer error
+            #reference: https://medium.com/@14prakash/back-propagation-is-very-simple-who-made-it-complicated-97b794c97e5c
+            outputError = -((targetVector[0]*math.log(layer3[0])) + ((1-targetVector[0])*math.log(1-layer3[0])) + (targetVector[1]*math.log(layer3[1])) + ((1-targetVector[1])*math.log(1-layer3[1])) + (targetVector[2]*math.log(layer3[2])) + ((1-targetVector[2])*math.log(1-layer3[2])))   
+            
             #---end output layer error calculation---
                 
                 
