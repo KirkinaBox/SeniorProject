@@ -34,6 +34,7 @@ def train(images, scores, epochs):
     
     #---Random filter weight initialization (0-255 is the range for HSV values)---
     #need to figure out why each filter produces the same random number
+    '''
     brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
@@ -54,6 +55,24 @@ def train(images, scores, epochs):
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)]]
     print("NormalFilter", normalFilter)
+    '''
+    brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255)],
+                    [randint(0, 255), randint(0, 255), randint(0, 255)],
+                    [randint(0, 255), randint(0, 255), randint(0, 255)]]
+                    
+    print("BrightFilter", brightFilter)
+                
+    dimFilter =    [[randint(0, 255), randint(0, 255), randint(0, 255)],
+                    [randint(0, 255), randint(0, 255), randint(0, 255)],
+                    [randint(0, 255), randint(0, 255), randint(0, 255)]]
+                    
+    print("DimFilter", dimFilter)
+
+    normalFilter = [[randint(0, 255), randint(0, 255), randint(0, 255)],
+                    [randint(0, 255), randint(0, 255), randint(0, 255)],
+                    [randint(0, 255), randint(0, 255), randint(0, 255)]]
+                    
+    print("NormalFilter", normalFilter)
 
     features = [brightFilter, dimFilter, normalFilter]
 
@@ -69,7 +88,7 @@ def train(images, scores, epochs):
             #print("image", b)
         
             #---Convolution step---
-            window = 5
+            window = 3
             wX = 0
             wY = 0
             filteredImageList = []
@@ -84,11 +103,12 @@ def train(images, scores, epochs):
                         windowTotal = 0
                         fiY = 0
                         for a in range(wY, wY+window):
-                            if (fiY < 5):
+                            if (fiY < window):
                                 fiX = 0
                                 for b in range(wX, wX+window):
-                                    if (fiX < 5):
-                                        if (images[b].getpixel((b, a))[2] == features[filter][fiY][fiX]):
+                                    if (fiX < window):
+                                        #if (images[b].getpixel((b, a))[2] == features[filter][fiY][fiX]):
+                                        if (abs(images[b].getpixel((b, a))[2] - features[filter][fiY][fiX]) <= 50):
                                             windowTotal += 1
                                         else:
                                             windowTotal += -1
@@ -283,7 +303,9 @@ def train(images, scores, epochs):
                     
                     
                     gradientA = (1/(b+1)) * outputError * np.array(layer2[o]).transpose()
-                    fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA   
+                    fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA
+                    
+                    
             #---end output layer gradient descent---
                 
             
@@ -302,6 +324,8 @@ def train(images, scores, epochs):
                     
                     
                     fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - ((1/(b+1)) * outputError * fcLayer2Weights[l][m])
+                    
+                    
             #---end layer2 gradient descent---
               
             
@@ -314,7 +338,17 @@ def train(images, scores, epochs):
                 for q in range(0, len(features[p])):
                     #singleFilterRow = []
                     for r in range(0, len(features[p][q])):
-                        features[p][q][r] = features[p][q][r] - np.sum(featuresErrorList[p][q]) #not sure if I should use np.sum or just single error value
+                        features[p][q][r] = math.ceil(features[p][q][r] - np.sum(featuresErrorList[p][q])) #not sure if I should use np.sum or just single error value
+                        if (features[p][q][r] < 0):
+                            #features[p][q][r] = 0
+                            features[p][q][r] = features[p][q][r]*(-1)
+                            while (features[p][q][r] > 255):
+                                features[p][q][r] = math.ceil(features[p][q][r]/10)
+                            #features[p][q][r] = features[p][q][r]/10
+                        if (features[p][q][r] > 255):
+                            #features[p][q][r] = 255
+                            while (features[p][q][r] > 255):
+                                features[p][q][r] = math.ceil(features[p][q][r]/10)
             #---end convolution filters' gradient descent---
              
                 

@@ -30,12 +30,14 @@ from scipy.misc import derivative
 def classify(image, features, weights2, weights3):
 
     #---Convolution step---
-    window = 5
+    window = 3
     wX = 0
     wY = 0
     filteredImageList = []
     
     for filter in range(0, len(features)): #for each feature
+        matches = 0
+        windowMatches = 0
         filteredImage = []
         wX = 0
         wY = 0
@@ -45,12 +47,15 @@ def classify(image, features, weights2, weights3):
                 windowTotal = 0
                 fiY = 0
                 for a in range(wY, wY+window):
-                    if (fiY < 5):
+                    if (fiY < window):
                         fiX = 0
                         for b in range(wX, wX+window):
-                            if (fiX < 5):
-                                if (image.getpixel((b, a))[2] == features[filter][fiY][fiX]):
+                            if (fiX < window):
+                                #if (image.getpixel((b, a))[2] == features[filter][fiY][fiX]):
+                                if (abs(image.getpixel((b, a))[2] - features[filter][fiY][fiX]) <= 50):
                                     windowTotal += 1
+                                    #print("match")
+                                    matches += 1
                                 else:
                                     windowTotal += -1
                                 fiX += 1
@@ -60,11 +65,16 @@ def classify(image, features, weights2, weights3):
                     filteredRow.append(0)
                 else:
                     filteredRow.append(average)
+                    windowMatches += 1
                 wX += 1
             filteredImage.append(filteredRow)
             wX = 0
             wY += 1
         filteredImageList.append(filteredImage)
+        #print("Convolution", filteredImage)
+        print("matches", matches)
+        print("window matches", windowMatches)
+        print("filtered image", filteredImage)
     #---End convolution step---
                 
                         
@@ -90,7 +100,7 @@ def classify(image, features, weights2, weights3):
             wY = wY+stride
         poolImages.append(poolSingle)
     #---end max-pooling step---
-            
+        print("pooled", poolSingle)    
             
     #---Fully-connected layers---
     #----------------------------
@@ -102,7 +112,7 @@ def classify(image, features, weights2, weights3):
             for n in range (0, len(poolImages[l][m])):
                 flattened.append(poolImages[l][m][n])
     #---end flattening step---
-                    
+    print("flattened", flattened)               
     
     #---Fully-connected layer from flattened 1D matrix to 1x10 matrix---                
     #Weighted connections pointing to each node in layer2

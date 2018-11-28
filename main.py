@@ -62,6 +62,8 @@ def userInput():
 
 #Function to generate visual output
 def eye(classification):
+    #defaultSize = 0.75
+    
     pupilSize = 0
     if (classification == "dim"):
         pupilSize = 1.0
@@ -70,12 +72,48 @@ def eye(classification):
     if (classification == "bright"):
         pupilSize = 0.5
     #pupil = 0.75
-    pupil = pyplot.Circle((0, 0), radius=pupilSize, color="black")
+    
+    
+    
+    figure = pyplot.figure()
+    figure.set_dpi(300)
+    figure.set_size_inches(1, 1)
+    
+    pupil = pyplot.Circle((0, 0), color="black", radius=pupilSize)
     iris = pyplot.Circle((0, 0), radius=1.5, color="saddlebrown")
     pyplot.gca().add_patch(iris)
     pyplot.gca().add_patch(pupil)
     pyplot.axis("scaled")
     pyplot.axis("off")
+    
+    
+    '''
+    def init():
+         pupil.set_radius(defaultSize)
+         return pupil
+    
+    def animate(i):
+        radius = pupil.radius
+        #endpoint = 0
+        if (classification == "dim"):
+            #endpoint = 1.0
+            radius = defaultSize + (0.01*i)
+        if (classification == "normal"):
+            #endpoint = 0.75
+            radius = defaultSize
+        if (classification == "bright"):
+            #endpoint = 0.5
+            radius = defaultSize - (0.01*i)
+        #pupil.radius = radius
+        pupil.set_radius(radius)
+        print(pupil.radius)
+        return pupil
+        
+    anim = animation.FuncAnimation(figure, animate, init_func=init, frames=25)
+    '''
+    
+    
+    
     pyplot.show()
 
 
