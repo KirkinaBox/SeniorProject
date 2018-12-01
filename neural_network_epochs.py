@@ -85,7 +85,10 @@ def train(images, scores, epochs):
     for a in range(0, epochs): #Number of times whole training set will go through network
         print("epoch ", a)
         for b in range(0, len(images)): #for each image in the training set
-            #print("image", b)
+            if (b == 69):
+                print("image", b)
+        
+        
         
             #---Convolution step---
             window = 3
@@ -108,7 +111,7 @@ def train(images, scores, epochs):
                                 for b in range(wX, wX+window):
                                     if (fiX < window):
                                         #if (images[b].getpixel((b, a))[2] == features[filter][fiY][fiX]):
-                                        if (abs(images[b].getpixel((b, a))[2] - features[filter][fiY][fiX]) <= 50):
+                                        if (abs(images[b].getpixel((b, a))[2] - features[filter][fiY][fiX]) <= 30):
                                             windowTotal += 1
                                         else:
                                             windowTotal += -1
@@ -126,6 +129,10 @@ def train(images, scores, epochs):
                 filteredImageList.append(filteredImage)
             #---end Convolution step---   
          
+            
+            
+            
+            
             
             #---Max-Pooling step---    
             stride = 2
@@ -151,8 +158,14 @@ def train(images, scores, epochs):
             #---end Max-Pooling step---   
             
             
+            
+            
+            
+            #-----------------------------
             #---Fully-connected layers----
             #-----------------------------
+            
+            
             
             #---Flattening max-pooled 3D matrix into 1D matrix---
             flattened = []
@@ -161,6 +174,11 @@ def train(images, scores, epochs):
                     for n in range (0, len(poolImages[l][m])):
                         flattened.append(poolImages[l][m][n])
             #---end flattening step---
+            
+            
+            
+            
+            
             
             
             #---Fully-connected layer from flattened 1D matrix to 1x10 matrix---
@@ -174,18 +192,26 @@ def train(images, scores, epochs):
                 weightList2 = weights(len(flattened), 2, iteration, i)
                 weightMatrix2.append(weightList2)
                 a = np.dot(weightList2, flattened) + bias2
-                if (a < 0): # ReLU
+                if (a < 0): #ReLU
                     a = 0
+                
                 layer2.append(a)
                 
-            layer2 = softmax(layer2)
+            #layer2 = softmax(layer2)
             #---end fully-connected layer: flattened -> layer2 step---
                 
+            
+            
+            
+            
+            
             
             #---Fully connected layer from 1x10 matrix to 1x3 matrix---
             #Weighted connections pointing to each node in layer3
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
-            layer3num = 3
+            
+            #layer3num = 3
+            layer3num = 2
             layer3 = []
             bias3 = 0
             weightMatrix3 = []
@@ -195,22 +221,36 @@ def train(images, scores, epochs):
                 a = np.dot(weightList3, layer2) + bias3 #might need something other than a dot product
                 if (a < 0): #ReLU
                     a = 0
+                
                 layer3.append(a)
             layer3 = softmax(layer3)
             #---end fully-connected layer: layer2 -> layer3 step--- 
+            
+            
+            
+            
+            
             
             
             #---Defining target vector based on score from CSV file--- 
             # targetVector = [dim, normal, bright]
             targetVector = []
             if (scores[b] == '0\r'):
-                targetVector = [1, 0, 0] #dim
-            if (scores[b] == '1\r'):
-                targetVector = [0, 1, 0] #normal
+                #targetVector = [1, 0, 0] #dim
+                targetVector = [1, 0]
+            #if (scores[b] == '1\r'):
+                #targetVector = [0, 1, 0] #normal
             if (scores[b] == '2\r'):
-                targetVector = [0, 0, 1] #bright
+                #targetVector = [0, 0, 1] #bright
+                targetVector = [0, 1]
             #---End target vector definition---
              
+            
+            
+            
+            
+            
+            
             
             #---Output layer error calculation---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
@@ -237,10 +277,58 @@ def train(images, scores, epochs):
                 
             #Cross-entropy calculation for output layer error
             #reference: https://medium.com/@14prakash/back-propagation-is-very-simple-who-made-it-complicated-97b794c97e5c
-            outputError = -((targetVector[0]*math.log(layer3[0])) + ((1-targetVector[0])*math.log(1-layer3[0])) + (targetVector[1]*math.log(layer3[1])) + ((1-targetVector[1])*math.log(1-layer3[1])) + (targetVector[2]*math.log(layer3[2])) + ((1-targetVector[2])*math.log(1-layer3[2])))   
+            #outputError = (-1/(b+1))*((targetVector[0]*math.log10(layer3[0])) + ((1-targetVector[0])*math.log10(1-layer3[0])) + (targetVector[1]*math.log10(layer3[1])) + ((1-targetVector[1])*math.log10(1-layer3[1])) + (targetVector[2]*math.log10(layer3[2])) + ((1-targetVector[2])*math.log10(1-layer3[2])))  
             
+            outputError = (-1/(b+1))*((targetVector[0]*math.log10(layer3[0])) + ((1-targetVector[0])*math.log10(1-layer3[0])) + (targetVector[1]*math.log10(layer3[1])) + ((1-targetVector[1])*math.log10(1-layer3[1]))) 
+            
+            #print("output error", outputError)
             #---end output layer error calculation---
                 
+            
+            
+            
+            
+            
+            
+            #---Derivatives of output layer cross-entropy---
+            #reference: https://medium.com/@14prakash/back-propagation-is-very-simple-who-made-it-complicated-97b794c97e5c
+            outputErrorD1 = -1 * ((targetVector[0]*(1/layer3[0])) + (1-targetVector[0])*(1/(1-layer3[0])))
+            
+            outputErrorD2 = -1 * ((targetVector[1]*(1/layer3[1])) + (1-targetVector[1])*(1/(1-layer3[1])))
+            
+            #outputErrorD3 = -1 * ((targetVector[2]*(1/layer3[2])) + (1-targetVector[2])*(1/(1-layer3[2])))
+            
+            #dEdOut = [outputErrorD1, outputErrorD2, outputErrorD3]
+            dEdOut = [outputErrorD1, outputErrorD2]
+            #---Derivatives of output layer with respect to input---
+            #reference: https://medium.com/@14prakash/back-propagation-is-very-simple-who-made-it-complicated-97b794c97e5c
+            #outputInputD1 = (math.exp(layer3[0])*(math.exp(layer3[1])+math.exp(layer3[2])))/math.pow((math.exp(layer3[0])+math.exp(layer3[1])+math.exp(layer3[2])), 2)
+            outputInputD1 = (math.exp(layer3[0])*math.exp(layer3[1]))/math.pow((math.exp(layer3[0])+math.exp(layer3[1])), 2)
+            
+            #outputInputD2 = (math.exp(layer3[1])*(math.exp(layer3[0])+math.exp(layer3[2])))/math.pow((math.exp(layer3[0])+math.exp(layer3[1])+math.exp(layer3[2])), 2)
+            outputInputD2 = (math.exp(layer3[1])*math.exp(layer3[0]))/math.pow((math.exp(layer3[0])+math.exp(layer3[1])), 2)
+            
+            #outputInputD3 = (math.exp(layer3[2])*(math.exp(layer3[0])+math.exp(layer3[1])))/math.pow((math.exp(layer3[0])+math.exp(layer3[1])+math.exp(layer3[2])), 2)
+            
+            #dOoutdOin = [outputInputD1, outputInputD2, outputInputD3]
+            dOoutdOin = [outputInputD1, outputInputD2]
+            
+            
+            '''
+            #Weight adjustment for layer2->layer3 weights
+            for e in range(0, len(weightMatrix3)):
+                #print(e)
+                #for f in range(0, len(weightMatrix3[e])-1):
+                for f in range(0, 2):
+                    #print(f)
+                    fcLayer3Weights[e][f] = dEdOut[f]*dOoutdOin[f]*layer2[e]
+            '''
+            
+            
+            
+            
+            
+            
                 
             #---Error backpropagation for layer2---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
@@ -271,8 +359,16 @@ def train(images, scores, epochs):
                 #errorB = np.array(derivative(a, 1.0))
                 #errorAB = np.multiply(errorA, errorB)
                 #layer2errorList.append(errorAB)
+            
+    
+            
             #---end layer2 error backpropagation---  
                 
+            
+            
+            
+            
+            
                 
             #---Error backpropagation for convolution filters---
             featuresErrorList = []
@@ -290,40 +386,57 @@ def train(images, scores, epochs):
                         
                         #a = features[f][g][h]
                         #errorB = np.array(derivative(a, 1.0))
-                        
+                        allNodes = [math.exp(i) for i in features[f][g]]
+                        restExceptCurrent = [math.exp(i) for i in features[f][g] if i != features[f][g][h]]
+                        errorB = (math.exp(features[f][g][h])*np.sum(restExceptCurrent))/np.sum(allNodes)
                         # ***Need to figure out derivative of softmax function***
                         #errorAB = np.multiply(errorA, errorB)
+                        errorAB = [i*errorB for i in errorA]
                         #singleFeatureRow.append(errorAB)
                         
                         
-                        singleFeatureRow.append(errorA) #need to replace with errorAB
+                        singleFeatureRow.append(errorAB) #need to replace with errorAB
                     singleFeatureErrorList.append(singleFeatureRow)
                 featuresErrorList.append(singleFeatureErrorList)
             #---end convolution filters' error backpropagation---
             
             
+            
+            
+            
+            
+            
             #---Gradient descent for output layer---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
-            for n in range(0, len(weightMatrix3)):
-                for o in range(0, len(weightMatrix3[n])):
+            
+            if (b == 4):
+                for n in range(0, len(weightMatrix3)):
+                    for o in range(0, len(weightMatrix3[n])):
                     
                     
-                    # ***Note: This algorithm might need editing and has code commented out for future reference***
+                        # ***Note: This algorithm might need editing and has code commented out for future reference***
                     
-                    #gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
-                    
-                    
-                    gradientA = (1/(b+1)) * outputError * np.array(layer2[o]).transpose()
-                    fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA
+                        #gradientA = np.dot(np.array(outputErrorList[n][o]), np.array(layer2[o]).transpose())
                     
                     
+                        gradientA = (1/(b+1)) * outputError * np.array(layer2[o]).transpose()
+                        fcLayer3Weights[n][o] = fcLayer3Weights[n][o] - gradientA
+                print("fcLayer3Weights", fcLayer3Weights)    
+                   
             #---end output layer gradient descent---
-                
+               
+            
+            
+            
+            
+            
+            
             
             #---Gradient descent for layer2---
             #reference: http://neuralnetworksanddeeplearning.com/chap2.html
-            for l in range(0, len(weightMatrix2)):
-                for m in range(0, len(weightMatrix2[l])):
+            if (b == 69):
+                for l in range(0, len(weightMatrix2)):
+                    for m in range(0, len(weightMatrix2[l])):
                     
                     
                     # ***Note: This algorithm might need editing and has code commented out for future reference***
@@ -334,11 +447,18 @@ def train(images, scores, epochs):
                     #fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - gradientA
                     
                     
-                    fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - ((1/(b+1)) * outputError * fcLayer2Weights[l][m])
+                        fcLayer2Weights[l][m] = fcLayer2Weights[l][m] - ((1/(b+1)) * outputError * fcLayer2Weights[l][m])
+                print("fcLayer2Weights", fcLayer2Weights)
                     
                     
             #---end layer2 gradient descent---
               
+            
+            
+            
+            
+            
+            
             
             #---Gradient descent for convolution filters---
             # ***Note: This algorithm might need editing and has code commented out for future reference***
@@ -362,6 +482,10 @@ def train(images, scores, epochs):
                                 features[p][q][r] = math.ceil(features[p][q][r]/10)
             #---end convolution filters' gradient descent---
              
+            
+            
+            
+            
                 
             #increase iteration variable for each image    
             iteration += 1

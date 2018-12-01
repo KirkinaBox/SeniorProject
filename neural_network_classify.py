@@ -52,7 +52,7 @@ def classify(image, features, weights2, weights3):
                         for b in range(wX, wX+window):
                             if (fiX < window):
                                 #if (image.getpixel((b, a))[2] == features[filter][fiY][fiX]):
-                                if (abs(image.getpixel((b, a))[2] - features[filter][fiY][fiX]) <= 50):
+                                if (abs(image.getpixel((b, a))[2] - features[filter][fiY][fiX]) <= 30):
                                     windowTotal += 1
                                     #print("match")
                                     matches += 1
@@ -74,7 +74,7 @@ def classify(image, features, weights2, weights3):
         #print("Convolution", filteredImage)
         print("matches", matches)
         print("window matches", windowMatches)
-        print("filtered image", filteredImage)
+        #print("filtered image", filteredImage)
     #---End convolution step---
                 
                         
@@ -100,7 +100,7 @@ def classify(image, features, weights2, weights3):
             wY = wY+stride
         poolImages.append(poolSingle)
     #---end max-pooling step---
-        print("pooled", poolSingle)    
+        #print("pooled", poolSingle)    
             
     #---Fully-connected layers---
     #----------------------------
@@ -112,7 +112,7 @@ def classify(image, features, weights2, weights3):
             for n in range (0, len(poolImages[l][m])):
                 flattened.append(poolImages[l][m][n])
     #---end flattening step---
-    print("flattened", flattened)               
+    #print("flattened", flattened)               
     
     #---Fully-connected layer from flattened 1D matrix to 1x10 matrix---                
     #Weighted connections pointing to each node in layer2
@@ -130,7 +130,8 @@ def classify(image, features, weights2, weights3):
     #---Fully connected layer from 1x10 matrix to 1x3 matrix---       
     #Weighted connections pointing to each node in layer3
     #reference: http://neuralnetworksanddeeplearning.com/chap2.html
-    layer3num = 3
+    #layer3num = 3
+    layer3num = 2
     layer3 = []
     bias3 = 0
     for i in range(0, layer3num):
@@ -142,14 +143,16 @@ def classify(image, features, weights2, weights3):
     print("OutputLayer", layer3)
     #---Classification step---   
     classification = ""      
-    if ((layer3[0] > layer3[1]) and (layer3[0] > layer3[2])):
+    #if ((layer3[0] > layer3[1]) and (layer3[0] > layer3[2])):
+    if ((layer3[0] > layer3[1]) and (abs(layer3[0]-layer3[1]) > 0.2)):
         classification = "dim"
-    elif ((layer3[1] >= layer3[0]) and (layer3[1] >= layer3[2])):
-        classification = "normal"
-    elif ((layer3[2] > layer3[0]) and (layer3[2] > layer3[1])):
+    #elif ((layer3[1] >= layer3[0]) and (layer3[1] >= layer3[2])):
+        #classification = "normal"
+    #elif ((layer3[2] > layer3[0]) and (layer3[2] > layer3[1])):
+    elif ((layer3[1] > layer3[0]) and (abs(layer3[0]-layer3[1]) > 0.2)):
         classification = "bright"
     else:
-        classification = "normal1"
+        classification = "normal"
     
     
     #---end classification step---
