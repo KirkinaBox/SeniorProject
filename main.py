@@ -22,11 +22,9 @@ Objective:
 from PIL import Image
 from neural_network_epochs import train
 from neural_network_classify import classify
-import numpy as np
 from matplotlib import pyplot
 from matplotlib import animation
 import mimetypes
-from os import path
 import pickle
 
 

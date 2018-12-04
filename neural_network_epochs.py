@@ -33,7 +33,7 @@ fcLayer3Weights = []
 def train(images, scores, epochs):
     
     #---Random filter weight initialization (0-255 is the range for HSV values)---
-    #need to figure out why each filter produces the same random number
+    
     '''
     brightFilter = [[randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],
                     [randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255), randint(0, 255)],

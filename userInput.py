@@ -30,7 +30,7 @@ import pickle
 
 
 def userInput():
-    #if (iteration == 1):
+
     print("Input an image file path: ")
     testImage = ""
     
@@ -41,7 +41,7 @@ def userInput():
             filePath = raw_input()
             filePath = imageCheck(filePath)
             testImage = Image.open(filePath)
-        #break
+        
         except IOError:
             print("This file cannot be found. Please input a valid file name: ")
         
@@ -58,13 +58,13 @@ def userInput():
     classification = classify(testImage, features, weights2, weights3)
     print(classification)
     eye(classification)
-    #iteration += 1
+    
     print("Enter to continue, or type 'exit' to stop: ")
     if (raw_input() == "exit"):
         return
     else:
         userInput()
-    #return
+    
 
 
 #Function to generate visual output
