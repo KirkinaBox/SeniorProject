@@ -1,12 +1,14 @@
 # Simulating Pupillary Light Reflex with a Neural Network
 The goal of this project is to simulate pupillary light reflex using a neural network
-program written in Python. The input of the program will be a series of images (JPEG format), and the program will produce visual output in the form of a circle, representing the pupil, dilating or constricting in response to the light intensity of the input images, taking into account the presence or absence of a flash of light in the images. This output will be produced based on the outcome of a feed-forward convolutional neural network that the image input will be analyzed by, and the output visualization itself will likely be generated using the library Pygame.
+program written in Python. The input of the program will be a series of images (JPEG format), and the program will produce visual output in the form of a circle, representing the pupil, dilating or constricting in response to the light intensity of the input images, taking into account the presence or absence of a flash of light in the images. This output will be produced based on the outcome of a feed-forward convolutional neural network that the image input will be analyzed by, and the output visualization is generated using Matplotlib's PyPlot module.
 
 ### In Progress:
-- [ ] Finishing implementation of fully-connected layer
+- [ ] Debugging error backpropagation/gradient descent
   - Researching and implementing error calculation and Softmax function (and any other necessary calculations)
-- [ ] Testing flow of neural network functions
-- [ ] Testing flow of training images through neural network
+- [ ] Adding images to training and testing sets
+- [ ] Measuring accuracy and variance
+- [ ] Animating visual output
+- [ ] Dynamic resizing of pupils
 
 ### Completed: 
  - 10/14/2018: Shortened and made corrections to convolution and pooling functions; implemented flattening in fully-connected layer
