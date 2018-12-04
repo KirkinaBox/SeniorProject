@@ -10,7 +10,8 @@ program written in Python. The input of the program will be a series of images (
 - [ ] Animating visual output
 - [ ] Dynamic resizing of pupils
 
-### Completed: 
+### Completed:
+ - Since 10/14/2018: created separate functions/files for training, classifying, and user input; implemented pickling and visual output; worked on debugging error backpropagation
  - 10/14/2018: Shortened and made corrections to convolution and pooling functions; implemented flattening in fully-connected layer
  - 10/13/2018: Made progress on pooling function
  - 10/12/2018: Started writing functions for convolution, pooling, and fully-connected layer; initialized filter matrices (one filter for each of the three image categories; defined target vectors based on training image scores (for use in fully-connected layer); implemented convolution function
